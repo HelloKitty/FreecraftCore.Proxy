@@ -10,25 +10,25 @@ using JetBrains.Annotations;
 namespace FreecraftCore
 {
 	//TODO: Add service/interface/context that allows server handlers to send messages through the client
-	public sealed class ProxiedAuthenticationSessionMessageContext : IPeerSessionMessageContext<AuthenticationServerPayload>
+	public sealed class ProxiedAuthenticationClientMessageContext : IPeerSessionMessageContext<AuthenticationClientPayload>
 	{
 		/// <inheritdoc />
 		public IConnectionService ConnectionService { get; }
 
 		/// <inheritdoc />
-		public IPeerPayloadSendService<AuthenticationServerPayload> PayloadSendService { get; }
+		public IPeerPayloadSendService<AuthenticationClientPayload> PayloadSendService { get; }
 
 		/// <inheritdoc />
-		public IPeerRequestSendService<AuthenticationServerPayload> RequestSendService { get; }
+		public IPeerRequestSendService<AuthenticationClientPayload> RequestSendService { get; }
 
 		/// <inheritdoc />
 		public SessionDetails Details { get; }
 
-		public IManagedNetworkClient<AuthenticationClientPayload, AuthenticationServerPayload> ProxyClient { get; }
+		public IManagedNetworkClient<AuthenticationServerPayload, AuthenticationClientPayload> ProxyClient { get; }
 
 		/// <inheritdoc />
-		public ProxiedAuthenticationSessionMessageContext([NotNull] IConnectionService connectionService, [NotNull] IPeerPayloadSendService<AuthenticationServerPayload> payloadSendService, 
-			[NotNull] IPeerRequestSendService<AuthenticationServerPayload> requestSendService, [NotNull] SessionDetails details, [NotNull] IManagedNetworkClient<AuthenticationClientPayload, AuthenticationServerPayload> proxyClient)
+		public ProxiedAuthenticationClientMessageContext([NotNull] IConnectionService connectionService, [NotNull] IPeerPayloadSendService<AuthenticationClientPayload> payloadSendService, 
+			[NotNull] IPeerRequestSendService<AuthenticationClientPayload> requestSendService, [NotNull] SessionDetails details, [NotNull] IManagedNetworkClient<AuthenticationServerPayload, AuthenticationClientPayload> proxyClient)
 		{
 			if(connectionService == null) throw new ArgumentNullException(nameof(connectionService));
 			if(payloadSendService == null) throw new ArgumentNullException(nameof(payloadSendService));

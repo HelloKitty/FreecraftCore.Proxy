@@ -9,7 +9,7 @@ using JetBrains.Annotations;
 
 namespace FreecraftCore
 {
-	public sealed class AuthenticationLogonChallengeSessionHandler : IPeerPayloadSpecificMessageHandler<AuthenticationClientPayload, AuthenticationServerPayload, ProxiedAuthenticationSessionMessageContext>
+	/*public sealed class AuthenticationLogonChallengeSessionHandler : IPeerPayloadSpecificMessageHandler<AuthenticationClientPayload, AuthenticationServerPayload, ProxiedAuthenticationSessionMessageContext>
 	{
 		private ILog Logger { get; }
 
@@ -27,5 +27,5 @@ namespace FreecraftCore
 
 			return Task.CompletedTask;
 		}
-	}
+	}*/
 }

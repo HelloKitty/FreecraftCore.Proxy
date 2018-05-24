@@ -49,8 +49,8 @@ namespace FreecraftCore
 			builder.RegisterInstance(Logger)
 				.As<ILog>();
 
-			builder.RegisterType<MessageHandlerService<AuthenticationClientPayload, AuthenticationServerPayload, IPeerSessionMessageContext<AuthenticationServerPayload>>>()
-				.As<MessageHandlerService<AuthenticationClientPayload, AuthenticationServerPayload, IPeerSessionMessageContext<AuthenticationServerPayload>>>()
+			builder.RegisterType<MessageHandlerService<AuthenticationClientPayload, AuthenticationServerPayload, ProxiedAuthenticationSessionMessageContext>>()
+				.As<MessageHandlerService<AuthenticationClientPayload, AuthenticationServerPayload, ProxiedAuthenticationSessionMessageContext>>()
 				.SingleInstance();
 
 			//This registers all the authentication message handlers
@@ -102,6 +102,7 @@ namespace FreecraftCore
 		/// <inheritdoc />
 		protected override IManagedNetworkServerClient<AuthenticationServerPayload, AuthenticationClientPayload> CreateIncomingSessionPipeline(TcpClient client)
 		{
+
 			//TODO: Are any details actually valuable here?
 			if(Logger.IsInfoEnabled)
 				Logger.Info($"Client connected to proxy.");
@@ -119,8 +120,20 @@ namespace FreecraftCore
 		/// <inheritdoc />
 		protected override ManagedClientSession<AuthenticationServerPayload, AuthenticationClientPayload> CreateIncomingSession(IManagedNetworkServerClient<AuthenticationServerPayload, AuthenticationClientPayload> client, SessionDetails details)
 		{
+			Logger.Info($"Recieved proxy connection from: {details.Address.AddressEndpoint.ToString()}:{details.Address.Port}");
+
+			//TODO: We should handle endpoints better. Not static defined
+			//We need to create an actual client to the server too.
+			IManagedNetworkClient<AuthenticationClientPayload, AuthenticationServerPayload> serverProxyClient = new DotNetTcpClientNetworkClient(new TcpClient())
+				.AddHeaderlessNetworkMessageReading(Serializer)
+				.For<AuthenticationServerPayload, AuthenticationClientPayload, IAuthenticationPayload>()
+				.Build()
+				.AsManaged();
+
+			serverProxyClient.Connect("127.0.0.1", 5050);
+
 			//TODO: Whenever a client session is created we should create a parallel client connection to the server we're in the middle of
-			return new ProxiedAuthenticationConnectionSession(client, details, ServiceContainer.Resolve<MessageHandlerService<AuthenticationClientPayload, AuthenticationServerPayload, IPeerSessionMessageContext<AuthenticationServerPayload>>>());
+			return new ProxiedAuthenticationConnectionSession(client, details, ServiceContainer.Resolve<MessageHandlerService<AuthenticationClientPayload, AuthenticationServerPayload, ProxiedAuthenticationSessionMessageContext>>(), serverProxyClient);
 		}
 	}
 }

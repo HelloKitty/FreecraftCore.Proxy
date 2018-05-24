@@ -10,7 +10,7 @@ using JetBrains.Annotations;
 
 namespace FreecraftCore
 {
-	public sealed class AuthDefaultRequestHandler : IPeerPayloadSpecificMessageHandler<AuthenticationClientPayload, AuthenticationServerPayload, IPeerSessionMessageContext<AuthenticationServerPayload>>
+	public sealed class AuthDefaultRequestHandler : IPeerPayloadSpecificMessageHandler<AuthenticationClientPayload, AuthenticationServerPayload, ProxiedAuthenticationSessionMessageContext>
 	{
 		private ILog Logger { get; }
 
@@ -22,8 +22,9 @@ namespace FreecraftCore
 			Logger = logger;
 		}
 
+#pragma warning disable AsyncFixer01 // Unnecessary async/await usage
 		/// <inheritdoc />
-		public Task HandleMessage(IPeerSessionMessageContext<AuthenticationServerPayload> context, AuthenticationClientPayload payload)
+		public async Task HandleMessage(ProxiedAuthenticationSessionMessageContext context, AuthenticationClientPayload payload)
 		{
 			if(Logger.IsWarnEnabled)
 				Logger.Warn($"Recieved unproxied Payload: {payload.GetType().Name} ConnectionId: {context.Details.ConnectionId}");
@@ -33,7 +34,10 @@ namespace FreecraftCore
 			//Alternatives is to add a middleware/pipeline extension that forwards "uninteresting" opcodes without even
 			//handling them.
 
-			return Task.CompletedTask;
+			//Forward to the server
+			await context.ProxyClient.SendMessage(payload)
+				.ConfigureAwait(false);
 		}
+#pragma warning restore AsyncFixer01 // Unnecessary async/await usage
 	}
 }

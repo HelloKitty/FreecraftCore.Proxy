@@ -61,7 +61,7 @@ namespace FreecraftCore
 			return GetType().GetTypeInfo()
 				.Assembly
 				.GetTypes()
-				.Where(t => t.GetInterfaces().Any(i => i.GetTypeInfo().IsGenericType && i.GetGenericTypeDefinition() == typeof(IPeerPayloadSpecificMessageHandler<,,>)))
+				.Where(t => t.GetInterfaces().Any(i => i.GetTypeInfo().IsGenericType && i.GetGenericTypeDefinition() == typeof(IPeerPayloadSpecificMessageHandler<,,>) && i.GenericTypeArguments.Contains(typeof(TPeerContextType)))) //must check context type now
 				.ToArray();
 		}
 	}

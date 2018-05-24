@@ -20,7 +20,7 @@ namespace FreecraftCore
 		/// <inheritdoc />
 		protected override IEnumerable<Type> ProduceAuthenticationPayloadTypes()
 		{
-			return new Type[] {typeof(AuthLogonChallengeRequest), typeof(AuthLogonChallengeResponse)};
+			return new Type[] {typeof(AuthLogonChallengeRequest), typeof(AuthLogonChallengeResponse), typeof(AuthLogonProofResponse), typeof(AuthLogonProofRequest), typeof(AuthRealmListRequest), typeof(AuthRealmListResponse)};
 		}
 
 		/// <inheritdoc />
