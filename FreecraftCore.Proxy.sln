@@ -7,9 +7,38 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{2E903AB5
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C69D878A-A37C-4DBD-8D90-8AF30074E3C0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreecraftCore.Proxy.Authentication", "src\FreecraftCore.Proxy.Authentication\FreecraftCore.Proxy.Authentication.csproj", "{6459FA3D-E336-4270-9A3B-2DAD97D26915}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreecraftCore.Proxy.Handler.Common", "src\FreecraftCore.Proxy.Handler.Common\FreecraftCore.Proxy.Handler.Common.csproj", "{AA041489-8E23-442D-BFF5-2AA580D76ECB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreecraftCore.Proxy.ManualAuthProxyTest", "tests\FreecraftCore.Proxy.ManualAuthProxyTest\FreecraftCore.Proxy.ManualAuthProxyTest.csproj", "{CDEA10BB-764A-44EB-B6A2-229CD68E0910}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6459FA3D-E336-4270-9A3B-2DAD97D26915}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6459FA3D-E336-4270-9A3B-2DAD97D26915}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6459FA3D-E336-4270-9A3B-2DAD97D26915}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6459FA3D-E336-4270-9A3B-2DAD97D26915}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA041489-8E23-442D-BFF5-2AA580D76ECB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA041489-8E23-442D-BFF5-2AA580D76ECB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA041489-8E23-442D-BFF5-2AA580D76ECB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA041489-8E23-442D-BFF5-2AA580D76ECB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDEA10BB-764A-44EB-B6A2-229CD68E0910}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDEA10BB-764A-44EB-B6A2-229CD68E0910}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDEA10BB-764A-44EB-B6A2-229CD68E0910}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDEA10BB-764A-44EB-B6A2-229CD68E0910}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6459FA3D-E336-4270-9A3B-2DAD97D26915} = {C69D878A-A37C-4DBD-8D90-8AF30074E3C0}
+		{AA041489-8E23-442D-BFF5-2AA580D76ECB} = {C69D878A-A37C-4DBD-8D90-8AF30074E3C0}
+		{CDEA10BB-764A-44EB-B6A2-229CD68E0910} = {2E903AB5-E882-49A7-A612-FCCB9F11D540}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {77340858-04C1-4169-93A3-121A82FA6670}
