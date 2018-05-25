@@ -10,12 +10,12 @@ using JetBrains.Annotations;
 
 namespace FreecraftCore
 {
-	public sealed class AuthDefaultRequestHandler : IPeerPayloadSpecificMessageHandler<AuthenticationClientPayload, AuthenticationServerPayload, ProxiedAuthenticationSessionMessageContext>
+	public sealed class AuthDefaultClientRequestHandler : IPeerPayloadSpecificMessageHandler<AuthenticationServerPayload, AuthenticationClientPayload, ProxiedAuthenticationClientMessageContext>
 	{
 		private ILog Logger { get; }
 
 		/// <inheritdoc />
-		public AuthDefaultRequestHandler([NotNull] ILog logger)
+		public AuthDefaultClientRequestHandler([NotNull] ILog logger)
 		{
 			if(logger == null) throw new ArgumentNullException(nameof(logger));
 
@@ -24,7 +24,7 @@ namespace FreecraftCore
 
 #pragma warning disable AsyncFixer01 // Unnecessary async/await usage
 		/// <inheritdoc />
-		public async Task HandleMessage(ProxiedAuthenticationSessionMessageContext context, AuthenticationClientPayload payload)
+		public async Task HandleMessage(ProxiedAuthenticationClientMessageContext context, AuthenticationServerPayload payload)
 		{
 			if(Logger.IsWarnEnabled)
 				Logger.Warn($"Recieved unproxied Payload: {payload.GetType().Name} ConnectionId: {context.Details.ConnectionId}");
@@ -34,6 +34,7 @@ namespace FreecraftCore
 			//Alternatives is to add a middleware/pipeline extension that forwards "uninteresting" opcodes without even
 			//handling them.
 
+			//TODO: Check if it is default payload. We don't want to forward defaults/unknowns
 			//Forward to the server
 			await context.ProxyClient.SendMessage(payload)
 				.ConfigureAwait(false);

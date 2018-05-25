@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Binarysharp.MemoryManagement;
 using Common.Logging;
 using FreecraftCore.Packet.Auth;
 using GladNet;
@@ -14,7 +15,7 @@ namespace FreecraftCore
 		public ManualAuthProxyTestApplicationBase(NetworkAddressInfo serverAddress, [NotNull] ILog logger) 
 			: base(serverAddress, logger)
 		{
-
+			
 		}
 
 		/// <inheritdoc />
@@ -27,7 +28,17 @@ namespace FreecraftCore
 		protected override IReadOnlyCollection<PayloadHandlerRegisterationModule<AuthenticationClientPayload, AuthenticationServerPayload, ProxiedAuthenticationSessionMessageContext>> ProduceServerMessageHandlerModules()
 		{
 			var moduleList = new List<PayloadHandlerRegisterationModule<AuthenticationClientPayload, AuthenticationServerPayload, ProxiedAuthenticationSessionMessageContext>>(5);
-			moduleList.Add(new ManualAuthProxyTestHandlerRegisterationModule());
+			moduleList.Add(new ManualAuthProxyTestSessionMessageHandlerRegisterationModule());
+			
+			return moduleList;
+		}
+
+		/// <inheritdoc />
+		protected override IReadOnlyCollection<PayloadHandlerRegisterationModule<AuthenticationServerPayload, AuthenticationClientPayload, ProxiedAuthenticationClientMessageContext>> ProduceClientMessageHandlerModules()
+		{
+			var moduleList = new List<PayloadHandlerRegisterationModule<AuthenticationServerPayload, AuthenticationClientPayload, ProxiedAuthenticationClientMessageContext>>(5);
+
+			moduleList.Add(new ManualAuthProxyTestClientMessageHandlerRegisterationModule());
 
 			return moduleList;
 		}

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
+using System.Threading.Tasks;
 using Autofac;
 using Common.Logging;
 using FreecraftCore.Packet.Auth;
@@ -42,15 +44,26 @@ namespace FreecraftCore
 			builder.RegisterInstance(Serializer)
 				.As<INetworkSerializationService>();
 
-			builder.RegisterType<AuthDefaultRequestHandler>()
+			//The default handlers (Just forwards)
+			builder.RegisterType<AuthDefaultClientRequestHandler>()
+				.AsImplementedInterfaces()
+				.SingleInstance();
+
+			builder.RegisterType<AuthDefaultSessionRequestHandler>()
 				.AsImplementedInterfaces()
 				.SingleInstance();
 
 			builder.RegisterInstance(Logger)
 				.As<ILog>();
 
+			//The session handlers
 			builder.RegisterType<MessageHandlerService<AuthenticationClientPayload, AuthenticationServerPayload, ProxiedAuthenticationSessionMessageContext>>()
 				.As<MessageHandlerService<AuthenticationClientPayload, AuthenticationServerPayload, ProxiedAuthenticationSessionMessageContext>>()
+				.SingleInstance();
+
+			//The proxy client handlers
+			builder.RegisterType<MessageHandlerService<AuthenticationServerPayload, AuthenticationClientPayload, ProxiedAuthenticationClientMessageContext>>()
+				.As<MessageHandlerService<AuthenticationServerPayload, AuthenticationClientPayload, ProxiedAuthenticationClientMessageContext>>()
 				.SingleInstance();
 
 			//This registers all the authentication message handlers
@@ -59,7 +72,10 @@ namespace FreecraftCore
 			ProduceServerMessageHandlerModules()
 				.ToList()
 				.ForEach(m => builder.RegisterModule(m));
-			
+
+			ProduceClientMessageHandlerModules()
+				.ToList()
+				.ForEach(m => builder.RegisterModule(m));
 
 			return builder.Build();
 		}
@@ -93,6 +109,14 @@ namespace FreecraftCore
 		/// <returns></returns>
 		protected abstract IReadOnlyCollection<PayloadHandlerRegisterationModule<AuthenticationClientPayload, AuthenticationServerPayload, ProxiedAuthenticationSessionMessageContext>> ProduceServerMessageHandlerModules();
 
+		/// <summary>
+		/// Implementers should return a collection of payload handler modules
+		/// that they would like the authentication proxy, acting as the client, to use.
+		/// Do NOT register server modules like this. Server modules with their own handlers are seperate.
+		/// </summary>
+		/// <returns></returns>
+		protected abstract IReadOnlyCollection<PayloadHandlerRegisterationModule<AuthenticationServerPayload, AuthenticationClientPayload, ProxiedAuthenticationClientMessageContext>> ProduceClientMessageHandlerModules();
+
 		/// <inheritdoc />
 		protected override bool IsClientAcceptable(TcpClient tcpClient)
 		{
@@ -117,23 +141,81 @@ namespace FreecraftCore
 			return managedClient;
 		}
 
+		//This builds the pipeline for the outgoing connection. The connection the client's messages are to be proxied through.
+		protected virtual IManagedNetworkServerClient<AuthenticationClientPayload, AuthenticationServerPayload> CreateOutgoingSessionPipeline(TcpClient client)
+		{
+			//TODO: We should handle endpoints better. Not static defined
+			//We need to create an actual client to the server too.
+			IManagedNetworkServerClient<AuthenticationClientPayload, AuthenticationServerPayload> serverProxyClient = new DotNetTcpClientNetworkClient(client)
+				.AddHeaderlessNetworkMessageReading(Serializer)
+				.For<AuthenticationServerPayload, AuthenticationClientPayload, IAuthenticationPayload>()
+				.Build()
+				.AsManagedSession();
+
+			return serverProxyClient;
+		}
+
 		/// <inheritdoc />
 		protected override ManagedClientSession<AuthenticationServerPayload, AuthenticationClientPayload> CreateIncomingSession(IManagedNetworkServerClient<AuthenticationServerPayload, AuthenticationClientPayload> client, SessionDetails details)
 		{
 			Logger.Info($"Recieved proxy connection from: {details.Address.AddressEndpoint.ToString()}:{details.Address.Port}");
 
-			//TODO: We should handle endpoints better. Not static defined
-			//We need to create an actual client to the server too.
-			IManagedNetworkClient<AuthenticationClientPayload, AuthenticationServerPayload> serverProxyClient = new DotNetTcpClientNetworkClient(new TcpClient())
-				.AddHeaderlessNetworkMessageReading(Serializer)
-				.For<AuthenticationServerPayload, AuthenticationClientPayload, IAuthenticationPayload>()
-				.Build()
-				.AsManaged();
+			//TODO: Don't hardcode this
+			//TcpClient proxyClientTcpClient = new TcpClient(Dns.GetHostEntry("logon.wowfeenix.com").HostName, 3724);
+			TcpClient proxyClientTcpClient = new TcpClient("127.0.0.1", 5050);
 
-			serverProxyClient.Connect("127.0.0.1", 5050);
+			//We need to create the proxy client now too
+			var proxyClient = CreateOutgoingSessionPipeline(proxyClientTcpClient);
+
 
 			//TODO: Whenever a client session is created we should create a parallel client connection to the server we're in the middle of
-			return new ProxiedAuthenticationConnectionSession(client, details, ServiceContainer.Resolve<MessageHandlerService<AuthenticationClientPayload, AuthenticationServerPayload, ProxiedAuthenticationSessionMessageContext>>(), serverProxyClient);
+			var connectionSession = new ProxiedAuthenticationConnectionSession(client, details, ServiceContainer.Resolve<MessageHandlerService<AuthenticationClientPayload, AuthenticationServerPayload, ProxiedAuthenticationSessionMessageContext>>(), new ProxiedSessionMessageContextFactory(proxyClient));
+
+			//After the connection session is made with the message context factory that has a dependency on the proxyclient we must create the proxy client's session
+			//which makes it easier to manage and it will have a dependency on the actual session
+
+			var clientProxySession = new ProxiedAuthenticationClientSession(proxyClient, details, ServiceContainer.Resolve<MessageHandlerService<AuthenticationServerPayload, AuthenticationClientPayload, ProxiedAuthenticationClientMessageContext>>(), new ProxiedClientMessageContextFactory(client));
+
+			//Now they can both communicate between eachother through the handler's message contexts
+			//However since the AppBase only takes one session type, to maintain this session we need to manually start it
+			//with the ManualClientConnectionLoop below. A copy-paste from the AppBase.
+			Task.Factory.StartNew(async () => { await ManualStartClientConnectionLoop(proxyClientTcpClient, proxyClient, clientProxySession); })
+				.ConfigureAwait(false);
+
+			return connectionSession;
+		}
+
+		private async Task ManualStartClientConnectionLoop(TcpClient client, IManagedNetworkServerClient<AuthenticationClientPayload, AuthenticationServerPayload> internalNetworkClient, ManagedClientSession<AuthenticationClientPayload, AuthenticationServerPayload> networkSession)
+		{
+			//So that sessions invoking the disconnection can internally disconnect to
+			networkSession.OnSessionDisconnection += (source, args) => internalNetworkClient.Disconnect();
+
+			var dispatchingStrategy = new InPlaceNetworkMessageDispatchingStrategy<AuthenticationClientPayload, AuthenticationServerPayload>();
+
+			try
+			{
+				while(client.Connected && internalNetworkClient.isConnected)
+				{
+					NetworkIncomingMessage<AuthenticationServerPayload> message = await internalNetworkClient.ReadMessageAsync(CancellationToken.None)
+						.ConfigureAwait(false);
+
+					//TODO: This will work for World of Warcraft since it requires no more than one packet
+					//from the same client be handled at one time. However it limits throughput and maybe we should
+					//handle this at a different level instead. 
+					await dispatchingStrategy.DispatchNetworkMessage(new SessionMessageContext<AuthenticationClientPayload, AuthenticationServerPayload>(networkSession, message))
+						.ConfigureAwait(false);
+				}
+			}
+			catch(Exception e)
+			{
+				//TODO: Remove this console log
+				Console.WriteLine($"[Error]: {e.Message}\n\nStack: {e.StackTrace}");
+			}
+
+			client.Dispose();
+
+			//TODO: Should we tell the client something when it ends?
+			networkSession.DisconnectClientSession();
 		}
 	}
 }

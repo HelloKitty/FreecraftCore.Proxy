@@ -8,7 +8,7 @@ namespace FreecraftCore
 	/// <summary>
 	/// This module allows for the registeration of all server handlers in the assembly.
 	/// </summary>
-	public sealed class ManualAuthProxyTestHandlerRegisterationModule : PayloadHandlerRegisterationModule<AuthenticationClientPayload, AuthenticationServerPayload, ProxiedAuthenticationSessionMessageContext>
+	public sealed class ManualAuthProxyTestClientMessageHandlerRegisterationModule : PayloadHandlerRegisterationModule<AuthenticationServerPayload, AuthenticationClientPayload, ProxiedAuthenticationClientMessageContext>
 	{
 		
 	}
