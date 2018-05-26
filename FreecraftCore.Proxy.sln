@@ -15,6 +15,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FreecraftCore.Proxy.ManualA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreecraftCore.Proxy.WarcraftClientPatcher.Application", "src\FreecraftCore.Proxy.WarcraftClientPatcher.Application\FreecraftCore.Proxy.WarcraftClientPatcher.Application.csproj", "{E021988F-E9F4-497D-AC69-198E31BC5D44}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreecraftCore.Proxy.ManualGameProxyTest", "tests\FreecraftCore.Proxy.ManualGameProxyTest\FreecraftCore.Proxy.ManualGameProxyTest.csproj", "{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreecraftCore.Proxy.Common", "src\FreecraftCore.Proxy.Common\FreecraftCore.Proxy.Common.csproj", "{F10D37E9-D303-47FE-8E2F-62BB19D9681B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +59,22 @@ Global
 		{E021988F-E9F4-497D-AC69-198E31BC5D44}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E021988F-E9F4-497D-AC69-198E31BC5D44}.Release|x86.ActiveCfg = Release|Any CPU
 		{E021988F-E9F4-497D-AC69-198E31BC5D44}.Release|x86.Build.0 = Release|Any CPU
+		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}.Debug|x86.Build.0 = Debug|Any CPU
+		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}.Release|x86.ActiveCfg = Release|Any CPU
+		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}.Release|x86.Build.0 = Release|Any CPU
+		{F10D37E9-D303-47FE-8E2F-62BB19D9681B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F10D37E9-D303-47FE-8E2F-62BB19D9681B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F10D37E9-D303-47FE-8E2F-62BB19D9681B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F10D37E9-D303-47FE-8E2F-62BB19D9681B}.Debug|x86.Build.0 = Debug|Any CPU
+		{F10D37E9-D303-47FE-8E2F-62BB19D9681B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F10D37E9-D303-47FE-8E2F-62BB19D9681B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F10D37E9-D303-47FE-8E2F-62BB19D9681B}.Release|x86.ActiveCfg = Release|Any CPU
+		{F10D37E9-D303-47FE-8E2F-62BB19D9681B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -64,6 +84,8 @@ Global
 		{AA041489-8E23-442D-BFF5-2AA580D76ECB} = {C69D878A-A37C-4DBD-8D90-8AF30074E3C0}
 		{CDEA10BB-764A-44EB-B6A2-229CD68E0910} = {2E903AB5-E882-49A7-A612-FCCB9F11D540}
 		{E021988F-E9F4-497D-AC69-198E31BC5D44} = {C69D878A-A37C-4DBD-8D90-8AF30074E3C0}
+		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E} = {2E903AB5-E882-49A7-A612-FCCB9F11D540}
+		{F10D37E9-D303-47FE-8E2F-62BB19D9681B} = {C69D878A-A37C-4DBD-8D90-8AF30074E3C0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {77340858-04C1-4169-93A3-121A82FA6670}

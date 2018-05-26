@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using FreecraftCore.Packet.Auth;
 using GladNet;
 using JetBrains.Annotations;
-using Moq;
 
 namespace FreecraftCore
 {
@@ -18,15 +16,7 @@ namespace FreecraftCore
 		/// </summary>
 		private MessageHandlerService<TPayloadReadType, TPayloadWriteType, TMessageContextType> AuthMessageHandlerService { get; }
 
-		public static IPeerRequestSendService<TPayloadWriteType> MockedInterceptor { get; }
-
 		private IGenericMessageContextFactory<TPayloadWriteType, TMessageContextType> MessageContextFactory { get; }
-
-		static ProxiedManagedClientSession()
-		{
-			//TODO: Implement when design issue in GladNet3 is fixed we can stop mocking this dependency.
-			MockedInterceptor = Mock.Of<IPeerRequestSendService<TPayloadWriteType>>();
-		}
 
 		/// <inheritdoc />
 		public ProxiedManagedClientSession(IManagedNetworkServerClient<TPayloadWriteType, TPayloadReadType> internalManagedNetworkClient, SessionDetails details,

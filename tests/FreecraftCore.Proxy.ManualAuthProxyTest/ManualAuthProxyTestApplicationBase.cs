@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Binarysharp.MemoryManagement;
 using Common.Logging;
 using FreecraftCore.Packet.Auth;
 using GladNet;
@@ -12,14 +11,13 @@ namespace FreecraftCore
 	public sealed class ManualAuthProxyTestApplicationBase : AuthenticationProxyApplicationBase
 	{
 		/// <inheritdoc />
-		public ManualAuthProxyTestApplicationBase(NetworkAddressInfo serverAddress, [NotNull] ILog logger) 
-			: base(serverAddress, logger)
+		public ManualAuthProxyTestApplicationBase(NetworkAddressInfo serverAddress, [NotNull] ILog logger, PayloadHandlerRegisterationModules<AuthenticationClientPayload, AuthenticationServerPayload> handlerModulePair, NetworkSerializerServicePair serializers) 
+			: base(serverAddress, logger, handlerModulePair, serializers)
 		{
-			
+
 		}
 
-		/// <inheritdoc />
-		protected override IEnumerable<Type> ProduceAuthenticationPayloadTypes()
+		/*protected override IEnumerable<Type> ProduceAuthenticationPayloadTypes()
 		{
 			return new Type[] {typeof(AuthLogonChallengeRequest), typeof(AuthLogonChallengeResponse), typeof(AuthLogonProofResponse), typeof(AuthLogonProofRequest), typeof(AuthRealmListRequest), typeof(AuthRealmListResponse)};
 		}
@@ -41,6 +39,6 @@ namespace FreecraftCore
 			moduleList.Add(new ManualAuthProxyTestClientMessageHandlerRegisterationModule());
 
 			return moduleList;
-		}
+		}*/
 	}
 }

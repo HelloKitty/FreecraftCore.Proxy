@@ -2,23 +2,23 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.8.1" />
-    <PackageReference Include="FreecraftCore.Packet.Auth" Version="1.0.2" />
     <PackageReference Include="FreecraftCore.Serializer" Version="3.0.29" />
     <PackageReference Include="GladNet3.Client.DotNetTcpClient" Version="3.0.31" />
     <PackageReference Include="GladNet3.Handler.API" Version="3.0.31" />
     <PackageReference Include="GladNet3.Serializer.FreecraftCore" Version="3.0.31" />
+    <PackageReference Include="GladNet3.Server.API" Version="3.0.31" />
     <PackageReference Include="GladNet3.Server.DotNetTcpServer" Version="3.0.31" />
-    <PackageReference Include="Moq" Version="4.8.2" />
+    <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FreecraftCore.Proxy.Common\FreecraftCore.Proxy.Common.csproj" />
-    <ProjectReference Include="..\FreecraftCore.Proxy.Handler.Common\FreecraftCore.Proxy.Handler.Common.csproj" />
+    <Reference Include="Moq">
+      <HintPath>..\..\..\..\..\.nuget\packages\moq\4.8.2\lib\netstandard1.3\Moq.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

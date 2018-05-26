@@ -3,27 +3,38 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Common.Logging;
 using FreecraftCore.API.Common;
 using FreecraftCore.Packet.Auth;
 using FreecraftCore.Packet.Common;
 using GladNet;
+using JetBrains.Annotations;
 
 namespace FreecraftCore
 {
-	public sealed class AuthenticationRealmListResponseClientHandler : IPeerPayloadSpecificMessageHandler<AuthRealmListResponse, AuthenticationClientPayload, ProxiedAuthenticationClientMessageContext>
+	public sealed class AuthenticationRealmListResponseServerHandler : BaseAuthenticationServerPayloadHandler<AuthRealmListResponse>
 	{
-#pragma warning disable AsyncFixer01 // Unnecessary async/await usage
-									/// <inheritdoc />
-		public async Task HandleMessage(ProxiedAuthenticationClientMessageContext context, AuthRealmListResponse payload)
+		/// <inheritdoc />
+		public AuthenticationRealmListResponseServerHandler([NotNull] ILog logger) 
+			: base(logger)
 		{
-			await context.ProxyClient.SendMessage(payload);
+
+		}
+
+#pragma warning disable AsyncFixer01 // Unnecessary async/await usage
+		/// <inheritdoc />
+		public override async Task HandleMessage(IProxiedMessageContext<AuthenticationClientPayload, AuthenticationServerPayload> context, AuthRealmListResponse payload)
+		{
+			Logger.Info("Entered captures realm list packet handler.");
+
+			await context.ProxyConnection.SendMessage(payload);
 			return;
 			//We have to rebuild the realm list to point to the proxy AND to adjust client build number
 
 			//TODO: Do real data transformation instead of test transformation
 			AuthRealmListResponse newRealmListResponse = new AuthRealmListResponse(payload.PayloadSize, new RealmInfo[] { RebuildRealmInfo(payload.Realms.First()) });
 
-			await context.ProxyClient.SendMessage(newRealmListResponse);
+			await context.ProxyConnection.SendMessage(newRealmListResponse);
 		}
 #pragma warning restore AsyncFixer01 // Unnecessary async/await usage
 

@@ -10,7 +10,7 @@ using JetBrains.Annotations;
 
 namespace FreecraftCore
 {
-	public sealed class AuthDefaultClientRequestHandler : IPeerPayloadSpecificMessageHandler<AuthenticationServerPayload, AuthenticationClientPayload, ProxiedAuthenticationClientMessageContext>
+	public sealed class AuthDefaultClientRequestHandler : IPeerPayloadSpecificMessageHandler<AuthenticationClientPayload, AuthenticationServerPayload, IProxiedMessageContext<AuthenticationServerPayload, AuthenticationClientPayload>>
 	{
 		private ILog Logger { get; }
 
@@ -24,19 +24,18 @@ namespace FreecraftCore
 
 #pragma warning disable AsyncFixer01 // Unnecessary async/await usage
 		/// <inheritdoc />
-		public async Task HandleMessage(ProxiedAuthenticationClientMessageContext context, AuthenticationServerPayload payload)
+		public async Task HandleMessage(IProxiedMessageContext<AuthenticationServerPayload, AuthenticationClientPayload> context, AuthenticationClientPayload payload)
 		{
 			if(Logger.IsWarnEnabled)
-				Logger.Warn($"Recieved unproxied Payload: {payload.GetType().Name} ConnectionId: {context.Details.ConnectionId}");
+				Logger.Warn($"Recieved unproxied Payload: {payload.GetType().Name} on {this.GetType().Name}");
 
 			//TODO: We cannot implement the default behavior of the proxy because some information is lost when we recieve an unknown payload.
 			//The information about the opcode is not exposed to the handler so we can just forward unknown messages.
 			//Alternatives is to add a middleware/pipeline extension that forwards "uninteresting" opcodes without even
 			//handling them.
 
-			//TODO: Check if it is default payload. We don't want to forward defaults/unknowns
 			//Forward to the server
-			await context.ProxyClient.SendMessage(payload)
+			await context.ProxyConnection.SendMessage(payload)
 				.ConfigureAwait(false);
 		}
 #pragma warning restore AsyncFixer01 // Unnecessary async/await usage
