@@ -10,6 +10,7 @@ namespace FreecraftCore
 	/// <summary>
 	/// Simplied type alias for authentication handlers that handle Client payloads sent from the client.
 	/// </summary>
+	[ClientPayloadHandler]
 	public abstract class BaseAuthenticationClientPayloadHandler<TSpecificPayloadType> : IPeerPayloadSpecificMessageHandler<TSpecificPayloadType, AuthenticationServerPayload, IProxiedMessageContext<AuthenticationServerPayload, AuthenticationClientPayload>>
 		where TSpecificPayloadType : AuthenticationClientPayload
 	{

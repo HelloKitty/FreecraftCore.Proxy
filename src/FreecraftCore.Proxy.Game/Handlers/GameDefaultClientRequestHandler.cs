@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Common.Logging;
+using FreecraftCore.Packet;
 using FreecraftCore.Packet.Auth;
 using GladNet;
 using JetBrains.Annotations;
@@ -11,12 +12,12 @@ using JetBrains.Annotations;
 namespace FreecraftCore
 {
 	[ClientPayloadHandler]
-	public sealed class AuthDefaultClientRequestHandler : IPeerPayloadSpecificMessageHandler<AuthenticationClientPayload, AuthenticationServerPayload, IProxiedMessageContext<AuthenticationServerPayload, AuthenticationClientPayload>>
+	public sealed class GameDefaultClientRequestHandler : IPeerPayloadSpecificMessageHandler<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>
 	{
 		private ILog Logger { get; }
 
 		/// <inheritdoc />
-		public AuthDefaultClientRequestHandler([NotNull] ILog logger)
+		public GameDefaultClientRequestHandler([NotNull] ILog logger)
 		{
 			if(logger == null) throw new ArgumentNullException(nameof(logger));
 
@@ -25,7 +26,7 @@ namespace FreecraftCore
 
 #pragma warning disable AsyncFixer01 // Unnecessary async/await usage
 		/// <inheritdoc />
-		public async Task HandleMessage(IProxiedMessageContext<AuthenticationServerPayload, AuthenticationClientPayload> context, AuthenticationClientPayload payload)
+		public async Task HandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, GamePacketPayload payload)
 		{
 			if(Logger.IsWarnEnabled)
 				Logger.Warn($"Recieved unproxied Payload: {payload.GetType().Name} on {this.GetType().Name}");

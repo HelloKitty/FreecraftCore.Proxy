@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using Autofac;
 using GladNet;
+using JetBrains.Annotations;
 using Module = Autofac.Module;
 
 namespace FreecraftCore
@@ -22,10 +23,23 @@ namespace FreecraftCore
 		where TOutgoingPayloadType : class
 		where TIncomingPayloadType : class
 	{
+		private List<Type> OptionalAttributeFilters { get; } = new List<Type>();
+
+		protected void AddRequiredAttribute<TAttributeType>()
+			where TAttributeType : Attribute
+		{
+			OptionalAttributeFilters.Add(typeof(TAttributeType));
+		}
+
 		/// <inheritdoc />
 		protected override void Load(ContainerBuilder builder)
 		{
 			IEnumerable<Type> handlerTypes = LoadHandlerTypes();
+
+			//Optionally filter with attribute types
+			handlerTypes = handlerTypes
+				.Where(h => OptionalAttributeFilters.All(a => h.GetCustomAttribute(a, true) != null))
+				.ToArray();
 
 			//Registers each type.
 			foreach(Type t in handlerTypes)

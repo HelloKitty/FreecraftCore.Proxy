@@ -10,6 +10,7 @@ using JetBrains.Annotations;
 
 namespace FreecraftCore
 {
+	[ServerPayloadHandler]
 	public sealed class AuthDefaultServerResponseHandler : IPeerPayloadSpecificMessageHandler<AuthenticationServerPayload, AuthenticationClientPayload, IProxiedMessageContext<AuthenticationClientPayload, AuthenticationServerPayload>>
 	{
 		private ILog Logger { get; }

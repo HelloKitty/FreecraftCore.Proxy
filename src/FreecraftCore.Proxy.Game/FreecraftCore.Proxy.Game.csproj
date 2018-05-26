@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FreecraftCore.Packet.Common" Version="1.0.2" />
+    <PackageReference Include="FreecraftCore.Packet.Game.Auth" Version="1.0.2" />
+    <PackageReference Include="FreecraftCore.Packet.Game.CharacterScreen" Version="1.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FreecraftCore.Proxy.Common\FreecraftCore.Proxy.Common.csproj" />
+  </ItemGroup>
+
+</Project>
