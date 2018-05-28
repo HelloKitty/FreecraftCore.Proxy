@@ -10,9 +10,11 @@ namespace FreecraftCore
 {
 	public sealed class GameTestNetworkSerializers : NetworkSerializerServicePair
 	{
+		private static INetworkSerializationService Serializer { get; } = BuildClientSerializer();
+
 		/// <inheritdoc />
 		public GameTestNetworkSerializers()
-			: base(BuildClientSerializer(), BuildServerSerializer())
+			: base(Serializer, Serializer)
 		{
 
 		}

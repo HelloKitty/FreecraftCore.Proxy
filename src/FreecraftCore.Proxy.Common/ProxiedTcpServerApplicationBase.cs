@@ -94,7 +94,7 @@ namespace FreecraftCore
 			//Now they can both communicate between eachother through the handler's message contexts
 			//However since the AppBase only takes one session type, to maintain this session we need to manually start it
 			//with the ManualClientConnectionLoop below. A copy-paste from the AppBase.
-			Task.Factory.StartNew(async () => { await ManualStartClientConnectionLoop(proxyClientTcpClient, proxyClient, clientProxySession); })
+			Task.Factory.StartNew(async () => { await ManualStartClientConnectionLoop(proxyClientTcpClient, proxyClient, clientProxySession).ConfigureAwait(false); })
 				.ConfigureAwait(false);
 
 			return connectionSession;

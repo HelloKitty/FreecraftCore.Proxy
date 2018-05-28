@@ -14,11 +14,6 @@ namespace FreecraftCore
 		//TODO: Inject this instead? Make this a strategy decorator?
 		private InPlaceNetworkMessageDispatchingStrategy<TPayloadWriteType, TPayloadReadType> DecoratedDisaDispatchingStrategy { get; }
 
-		/// <summary>
-		/// Async lock.
-		/// </summary>
-		private static AsyncLock LockObject { get; } = new AsyncLock();
-
 		public InPlaceAsyncLockedNetworkMessageDispatchingStrategy()
 		{
 			DecoratedDisaDispatchingStrategy = new InPlaceNetworkMessageDispatchingStrategy<TPayloadWriteType, TPayloadReadType>();
@@ -26,8 +21,21 @@ namespace FreecraftCore
 
 		public async Task DispatchNetworkMessage(SessionMessageContext<TPayloadWriteType, TPayloadReadType> context)
 		{
-			using(await LockObject.LockAsync())
-				await DecoratedDisaDispatchingStrategy.DispatchNetworkMessage(context);
+			using(await InPlaceAsyncLockedNetworkMessageDispatchingStrategy.LockObject.LockAsync().ConfigureAwait(false))
+				await DecoratedDisaDispatchingStrategy.DispatchNetworkMessage(context)
+					.ConfigureAwait(false);
 		}
+	}
+
+	/// <summary>
+	/// Non-generic <see cref="InPlaceNetworkMessageDispatchingStrategy{TPayloadWriteType,TPayloadReadType}"/>
+	/// for static properties/fields.
+	/// </summary>
+	internal sealed class InPlaceAsyncLockedNetworkMessageDispatchingStrategy
+	{
+		/// <summary>
+		/// Async lock.
+		/// </summary>
+		internal static AsyncLock LockObject { get; } = new AsyncLock();
 	}
 }

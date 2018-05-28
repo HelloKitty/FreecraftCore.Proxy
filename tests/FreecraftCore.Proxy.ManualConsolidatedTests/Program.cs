@@ -9,11 +9,12 @@ namespace FreecraftCore.Proxy.ManualConsolidatedTests
 	{
 		static async Task Main(string[] args)
 		{
-			Task.Factory.StartNew(async () => await FreecraftCore.Auth.Program.Main(null), TaskCreationOptions.LongRunning);
-			Task.Factory.StartNew(async () => await FreecraftCore.Game.Program.Main(null), TaskCreationOptions.LongRunning);
+			Task.Factory.StartNew(async () => await FreecraftCore.Auth.Program.Main(null).ConfigureAwait(false), TaskCreationOptions.LongRunning);
+			Task.Factory.StartNew(async () => await FreecraftCore.Game.Program.Main(null).ConfigureAwait(false), TaskCreationOptions.LongRunning);
 
 			while(true)
-				await Task.Delay(5000);
+				await Task.Delay(5000)
+					.ConfigureAwait(false);
 		}
 	}
 }

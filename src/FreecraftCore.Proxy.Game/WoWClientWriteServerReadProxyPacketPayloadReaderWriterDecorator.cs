@@ -111,7 +111,7 @@ namespace FreecraftCore
 			//Serializer the payload first so we can build the header
 			byte[] payloadData = Serializer.Serialize(payload);
 
-			OutgoingClientPacketHeader header = new OutgoingClientPacketHeader(payloadData.Length - 2, (NetworkOperationCode)payloadData.Reinterpret<short>());
+			OutgoingClientPacketHeader header = new OutgoingClientPacketHeader(payloadData.Length - 2, (NetworkOperationCode)payloadData.Reinterpret<short>(0));
 
 			Console.WriteLine($"New ClientHeader: OpCode: {header.OperationCode} PacketSize: {header.PacketSize} PayloadSize: {header.PayloadSize}");
 
@@ -135,7 +135,8 @@ namespace FreecraftCore
 				await DecoratedClient.WriteAsync(payloadData, 2, header.PayloadSize)
 					.ConfigureAwait(false);
 			}
-			Console.WriteLine($"Hit write we shouldn't have. Type: {payload.GetType().Name}");
+
+			Console.WriteLine($"Send to client: {payload.GetType()}");
 		}
 
 		/// <inheritdoc />

@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.8.1" />
-    <PackageReference Include="GladNet3.Handler.API" Version="3.0.31" />
+    <PackageReference Include="GladNet3.Handler.API" Version="3.0.34" />
   </ItemGroup>
 
 </Project>

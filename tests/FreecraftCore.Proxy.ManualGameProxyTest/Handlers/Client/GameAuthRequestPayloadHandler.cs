@@ -35,14 +35,15 @@ namespace FreecraftCore
 			//We must read the session key from the client now and then
 			//we want to initialize our ingoing and outgoing encryption.
 			Console.Write("Enter Warcraft ProcessId: ");
-			string processId = "11460";//Console.ReadLine();
+			string processId = Console.ReadLine();
 
 			byte[] sessionKey = ReadSessionKeyFromProcessMemory(processId);
 
 			//We should send the auth request before initializing encryption
 			CryptoInitializer.Initialize(sessionKey);
 
-			await context.ProxyConnection.SendMessage(payload);
+			await context.ProxyConnection.SendMessageImmediately(payload, DeliveryMethod.ReliableOrdered)
+				.ConfigureAwait(false);
 		}
 #pragma warning restore AsyncFixer01 // Unnecessary async/await usage
 
