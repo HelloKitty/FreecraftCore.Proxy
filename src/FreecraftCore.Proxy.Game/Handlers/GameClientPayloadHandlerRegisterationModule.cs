@@ -13,6 +13,11 @@ namespace FreecraftCore
 	/// </summary>
 	public abstract class GameClientPayloadHandlerRegisterationModule : PayloadHandlerRegisterationModule<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>
 	{
+		/// <summary>
+		/// The string constant used to name client handlers.
+		/// </summary>
+		public static string ClientHandlerNamedConstant { get; } = "Client";
+
 		/// <inheritdoc />
 		protected override IEnumerable<Type> OnProcessHandlerTypes(IEnumerable<Type> handlerTypes)
 		{
@@ -20,6 +25,13 @@ namespace FreecraftCore
 			//add the required attribute
 			return base.OnProcessHandlerTypes(handlerTypes)
 				.Where(t => t.GetCustomAttribute<ClientPayloadHandlerAttribute>(true) != null);
+		}
+
+		/// <inheritdoc />
+		protected override void ExtendedHandlerRegisterationDetails(IRegistrationBuilder<object, SimpleActivatorData, SingleRegistrationStyle> registrationBuilder, Type handlerType)
+		{
+			base.ExtendedHandlerRegisterationDetails(registrationBuilder, handlerType);
+			registrationBuilder.Named(ClientHandlerNamedConstant, handlerType); //we need to register this as a Server handler since the Types are the same.
 		}
 	}
 }

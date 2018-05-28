@@ -76,6 +76,7 @@ namespace FreecraftCore
 		protected virtual void ExtendedHandlerRegisterationDetails(IRegistrationBuilder<object, SimpleActivatorData, SingleRegistrationStyle> registrationBuilder, Type handlerType)
 		{
 			//Do nothing, let inheritors mess with this.
+			registrationBuilder.Named("Client", handlerType);
 		}
 
 		private IReadOnlyCollection<Type> LoadHandlerTypes()

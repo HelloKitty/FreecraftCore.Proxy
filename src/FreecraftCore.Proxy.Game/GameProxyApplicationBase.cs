@@ -92,11 +92,12 @@ namespace FreecraftCore
 			builder.Register<MessageHandlerService<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>>(context =>
 				{
 					IPeerMessageHandler<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>[] handlers
-						= context.Resolve<IEnumerable<IPeerMessageHandler<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>>>()
-							//.Where(h => h.GetType().GetCustomAttribute<ServerPayloadHandlerAttribute>(true) != null)
+						= context.ResolveNamed<IEnumerable<IPeerMessageHandler<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>>>("Server")
 							.ToArray();
 
-				return new MessageHandlerService<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>(handlers, context.Resolve<GameDefaultServerResponseHandler>());
+					Console.WriteLine($"Found: {handlers.Length} many server handlers.");
+
+					return new MessageHandlerService<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>(handlers, context.Resolve<GameDefaultServerResponseHandler>());
 			})
 				.Named<MessageHandlerService<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>>("Server")
 				.SingleInstance();
@@ -105,8 +106,7 @@ namespace FreecraftCore
 			builder.Register<MessageHandlerService<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>>(context =>
 				{
 					IPeerMessageHandler<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>[] handlers
-						= context.Resolve<IEnumerable<IPeerMessageHandler<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>>>()
-							//.Where(h => h.GetType().GetCustomAttribute<ClientPayloadHandlerAttribute>(true) != null)
+						= context.ResolveNamed<IEnumerable<IPeerMessageHandler<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>>>("Client")
 							.ToArray();
 
 					Console.WriteLine($"Found: {handlers.Length} many client handlers.");
