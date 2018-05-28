@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Text;
-using FreecraftCore.Packet;
-using FreecraftCore.Packet.Auth;
+using Autofac;
+using Autofac.Builder;
 
 namespace FreecraftCore
 {
@@ -11,11 +13,13 @@ namespace FreecraftCore
 	/// </summary>
 	public abstract class GameClientPayloadHandlerRegisterationModule : PayloadHandlerRegisterationModule<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>
 	{
-		protected GameClientPayloadHandlerRegisterationModule()
+		/// <inheritdoc />
+		protected override IEnumerable<Type> OnProcessHandlerTypes(IEnumerable<Type> handlerTypes)
 		{
 			//Since game packet payloads are same for incoming and outgoing we need to
 			//add the required attribute
-			AddRequiredAttribute<ClientPayloadHandlerAttribute>();
+			return base.OnProcessHandlerTypes(handlerTypes)
+				.Where(t => t.GetCustomAttribute<ClientPayloadHandlerAttribute>(true) != null);
 		}
 	}
 }

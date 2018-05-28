@@ -4,9 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Common.Logging;
-using FreecraftCore.API.Common;
-using FreecraftCore.Packet.Auth;
-using FreecraftCore.Packet.Common;
 using GladNet;
 using JetBrains.Annotations;
 

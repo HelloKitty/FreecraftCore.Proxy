@@ -2,7 +2,44 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>net462</TargetFramework>
+    <Platforms>x86</Platforms>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <LangVersion>7.1</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <LangVersion>7.1</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <LangVersion>7.2</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <LangVersion>7.2</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="fasterflect" Version="2.1.3" />
+    <PackageReference Include="FreecraftCore.API.Common.Addon" Version="1.0.13" />
+    <PackageReference Include="FreecraftCore.API.Common.Auth" Version="1.0.13" />
+    <PackageReference Include="FreecraftCore.API.Common.Character" Version="1.0.13" />
+    <PackageReference Include="FreecraftCore.API.Common.Chat" Version="1.0.13" />
+    <PackageReference Include="FreecraftCore.API.Common.Core" Version="1.0.13" />
+    <PackageReference Include="FreecraftCore.API.Common.Entity.Identity" Version="1.0.13" />
+    <PackageReference Include="FreecraftCore.API.Common.Movement" Version="1.0.13" />
+    <PackageReference Include="FreecraftCore.API.Common.Warden" Version="1.0.13" />
+    <PackageReference Include="FreecraftCore.Crypto.Packet" Version="1.0.13" />
+    <PackageReference Include="FreecraftCore.Crypto.RC4" Version="1.0.13" />
+    <PackageReference Include="MemorySharp" Version="1.2.0" />
+    <PackageReference Include="Moq" Version="4.8.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\FreecraftCore.Proxy.Game\FreecraftCore.Proxy.Game.csproj" />
+  </ItemGroup>
 
 </Project>

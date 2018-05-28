@@ -7,7 +7,7 @@ namespace FreecraftCore
 	/// <summary>
 	/// Attribute that hints that the handler is a client payload handler.
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Class)]
+	[AttributeUsage(AttributeTargets.Class, Inherited = true)]
 	public sealed class ClientPayloadHandlerAttribute : Attribute
 	{
 		

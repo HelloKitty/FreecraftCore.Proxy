@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Common.Logging;
-using FreecraftCore.Packet.Auth;
 using GladNet;
 using JetBrains.Annotations;
 

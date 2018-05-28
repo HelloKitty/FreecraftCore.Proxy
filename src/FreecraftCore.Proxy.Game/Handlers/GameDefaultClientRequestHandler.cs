@@ -4,14 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Common.Logging;
-using FreecraftCore.Packet;
-using FreecraftCore.Packet.Auth;
 using GladNet;
 using JetBrains.Annotations;
 
 namespace FreecraftCore
 {
-	[ClientPayloadHandler]
 	public sealed class GameDefaultClientRequestHandler : IPeerPayloadSpecificMessageHandler<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>
 	{
 		private ILog Logger { get; }
@@ -35,6 +32,9 @@ namespace FreecraftCore
 			//The information about the opcode is not exposed to the handler so we can just forward unknown messages.
 			//Alternatives is to add a middleware/pipeline extension that forwards "uninteresting" opcodes without even
 			//handling them.
+
+			if(payload is UnknownGamePayload)
+				return;
 
 			//Forward to the server
 			await context.ProxyConnection.SendMessage(payload)

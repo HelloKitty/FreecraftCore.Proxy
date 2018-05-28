@@ -6,8 +6,8 @@ using Common.Logging.Factory;
 
 namespace FreecraftCore
 {
-    public sealed class ConsoleLogger : AbstractLogger
-    {
+	public sealed class ConsoleLogger : AbstractLogger
+	{
 		private LogLevel LoggingLevel { get; }
 
 		/// <inheritdoc />

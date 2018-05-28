@@ -6,11 +6,25 @@ using Moq;
 namespace FreecraftCore
 {
 	public sealed class GenericMessageContextFactory<TPayloadWriteType, TPayloadReadType> : IGenericMessageContextFactory<TPayloadWriteType, IProxiedMessageContext<TPayloadWriteType, TPayloadReadType>> 
-		where TPayloadWriteType : class where TPayloadReadType : class
+		where TPayloadWriteType : class 
+		where TPayloadReadType : class
 	{
 		private IManagedNetworkClient<TPayloadReadType, TPayloadWriteType> ProxyConnection { get; }
 
-		private static IPeerRequestSendService<TPayloadWriteType> MockedPeerRequestService { get; } = Mock.Of<IPeerRequestSendService<TPayloadWriteType>>();
+		private static IPeerRequestSendService<TPayloadWriteType> MockedPeerRequestService { get; }
+
+		static GenericMessageContextFactory()
+		{
+			try
+			{
+				MockedPeerRequestService = Mock.Of<IPeerRequestSendService<TPayloadWriteType>>();
+			}
+			catch(Exception e)
+			{
+				throw new InvalidOperationException($"Failed to create Mocked peer request service for Type: {nameof(TPayloadWriteType)}", e);
+				throw;
+			}
+		}
 
 		public GenericMessageContextFactory([NotNull] IManagedNetworkClient<TPayloadReadType, TPayloadWriteType> proxyConnection)
 		{

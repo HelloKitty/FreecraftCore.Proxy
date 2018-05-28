@@ -1,12 +1,36 @@
 ﻿using System;
+using System.Net;
+using System.Threading.Tasks;
+using Common.Logging;
+using Common.Logging.Factory;
+using GladNet;
 
-namespace FreecraftCore.Proxy.ManualGameProxyTest
+namespace FreecraftCore.Game
 {
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello World!");
-        }
-    }
+	public class Program
+	{
+		public static async Task Main(string[] args)
+		{
+			GameTestHandlerRegisterationModule gameHandlerModules = new GameTestHandlerRegisterationModule();
+
+			gameHandlerModules.AddServerHandlerModule(new ManualGameProxyTestSessionMessageHandlerRegisterationModule());
+			gameHandlerModules.AddClientHanderModule(new ManualGameProxyTestClientMessageHandlerRegisterationModule());
+
+			GameProxyApplicationBase appBase = new GameProxyApplicationBase(new NetworkAddressInfo(IPAddress.Parse("127.0.0.1"), 8085),
+				new NetworkAddressInfo(IPAddress.Parse("127.0.0.1"), 5051),
+				new ConsoleLogger(LogLevel.All), gameHandlerModules, 
+				new GameTestNetworkSerializers());
+
+			if(!appBase.StartServer())
+			{
+				Console.WriteLine("Failed to start proxy. Press any key to close.");
+				Console.ReadKey();
+				return;
+			}
+
+			Console.WriteLine("Starting game proxy.");
+
+			await appBase.BeginListening();
+		}
+	}
 }

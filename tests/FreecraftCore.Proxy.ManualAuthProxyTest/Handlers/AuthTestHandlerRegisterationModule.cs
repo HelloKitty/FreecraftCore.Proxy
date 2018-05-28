@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using FreecraftCore.Packet.Auth;
 using JetBrains.Annotations;
 
 namespace FreecraftCore

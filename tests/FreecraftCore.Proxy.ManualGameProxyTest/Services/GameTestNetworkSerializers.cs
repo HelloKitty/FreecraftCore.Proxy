@@ -8,10 +8,10 @@ using JetBrains.Annotations;
 
 namespace FreecraftCore
 {
-	public sealed class AuthTestNetworkSerializers : NetworkSerializerServicePair
+	public sealed class GameTestNetworkSerializers : NetworkSerializerServicePair
 	{
 		/// <inheritdoc />
-		public AuthTestNetworkSerializers() 
+		public GameTestNetworkSerializers()
 			: base(BuildClientSerializer(), BuildServerSerializer())
 		{
 
@@ -27,11 +27,14 @@ namespace FreecraftCore
 		{
 			SerializerService serializer = new SerializerService();
 
-			Type[] AuthPayloads = new Type[] { typeof(AuthLogonChallengeRequest), typeof(AuthLogonChallengeResponse), typeof(AuthLogonProofResponse), typeof(AuthLogonProofRequest), typeof(AuthRealmListRequest), typeof(AuthRealmListResponse) };
-
-			AuthPayloads
+			GamePacketMetadataMarker
+				.SerializableTypes
 				.ToList()
 				.ForEach(t => serializer.RegisterType(t));
+
+			//Also the header types
+			serializer.RegisterType<ServerPacketHeader>();
+			serializer.RegisterType<OutgoingClientPacketHeader>();
 
 			serializer.Compile();
 

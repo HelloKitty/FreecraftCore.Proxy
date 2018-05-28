@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using Common.Logging;
-using FreecraftCore.Packet.Auth;
 using FreecraftCore.Serializer;
 using GladNet;
 using JetBrains.Annotations;
@@ -17,8 +16,8 @@ namespace FreecraftCore
 	public class AuthenticationProxyApplicationBase : ProxiedTcpServerApplicationBase<AuthenticationServerPayload, AuthenticationClientPayload>
 	{
 		/// <inheritdoc />
-		protected AuthenticationProxyApplicationBase(NetworkAddressInfo serverAddress, [NotNull] ILog logger, PayloadHandlerRegisterationModules<AuthenticationClientPayload, AuthenticationServerPayload> handlerModulePair, NetworkSerializerServicePair serializers) 
-			: base(serverAddress, logger, handlerModulePair, serializers)
+		public AuthenticationProxyApplicationBase(NetworkAddressInfo listenerAddress, [NotNull] NetworkAddressInfo proxyToEndpointAddress, [NotNull] ILog logger, PayloadHandlerRegisterationModules<AuthenticationClientPayload, AuthenticationServerPayload> handlerModulePair, NetworkSerializerServicePair serializers) 
+			: base(listenerAddress, proxyToEndpointAddress, logger, handlerModulePair, serializers)
 		{
 
 		}

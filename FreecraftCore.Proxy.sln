@@ -19,7 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FreecraftCore.Proxy.ManualG
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FreecraftCore.Proxy.Common", "src\FreecraftCore.Proxy.Common\FreecraftCore.Proxy.Common.csproj", "{F10D37E9-D303-47FE-8E2F-62BB19D9681B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreecraftCore.Proxy.Game", "src\FreecraftCore.Proxy.Game\FreecraftCore.Proxy.Game.csproj", "{4A8F8533-95A0-4815-BDB4-79D8D73E1647}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FreecraftCore.Proxy.Game", "src\FreecraftCore.Proxy.Game\FreecraftCore.Proxy.Game.csproj", "{4A8F8533-95A0-4815-BDB4-79D8D73E1647}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FreecraftCore.Proxy.ManualConsolidatedTests", "tests\FreecraftCore.Proxy.ManualConsolidatedTests\FreecraftCore.Proxy.ManualConsolidatedTests.csproj", "{AD635AF0-5032-46AE-9CDF-A9014C98038E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,14 +63,12 @@ Global
 		{E021988F-E9F4-497D-AC69-198E31BC5D44}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E021988F-E9F4-497D-AC69-198E31BC5D44}.Release|x86.ActiveCfg = Release|Any CPU
 		{E021988F-E9F4-497D-AC69-198E31BC5D44}.Release|x86.Build.0 = Release|Any CPU
-		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}.Debug|x86.Build.0 = Debug|Any CPU
-		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}.Release|x86.ActiveCfg = Release|Any CPU
-		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}.Release|x86.Build.0 = Release|Any CPU
+		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}.Debug|x86.ActiveCfg = Debug|x86
+		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}.Debug|x86.Build.0 = Debug|x86
+		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}.Release|Any CPU.ActiveCfg = Release|x86
+		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}.Release|x86.ActiveCfg = Release|x86
+		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E}.Release|x86.Build.0 = Release|x86
 		{F10D37E9-D303-47FE-8E2F-62BB19D9681B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F10D37E9-D303-47FE-8E2F-62BB19D9681B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F10D37E9-D303-47FE-8E2F-62BB19D9681B}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -85,6 +85,14 @@ Global
 		{4A8F8533-95A0-4815-BDB4-79D8D73E1647}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4A8F8533-95A0-4815-BDB4-79D8D73E1647}.Release|x86.ActiveCfg = Release|Any CPU
 		{4A8F8533-95A0-4815-BDB4-79D8D73E1647}.Release|x86.Build.0 = Release|Any CPU
+		{AD635AF0-5032-46AE-9CDF-A9014C98038E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD635AF0-5032-46AE-9CDF-A9014C98038E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD635AF0-5032-46AE-9CDF-A9014C98038E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AD635AF0-5032-46AE-9CDF-A9014C98038E}.Debug|x86.Build.0 = Debug|Any CPU
+		{AD635AF0-5032-46AE-9CDF-A9014C98038E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD635AF0-5032-46AE-9CDF-A9014C98038E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD635AF0-5032-46AE-9CDF-A9014C98038E}.Release|x86.ActiveCfg = Release|Any CPU
+		{AD635AF0-5032-46AE-9CDF-A9014C98038E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -97,6 +105,7 @@ Global
 		{995F0C7D-2839-4B7B-90DF-A76B30CFD24E} = {2E903AB5-E882-49A7-A612-FCCB9F11D540}
 		{F10D37E9-D303-47FE-8E2F-62BB19D9681B} = {C69D878A-A37C-4DBD-8D90-8AF30074E3C0}
 		{4A8F8533-95A0-4815-BDB4-79D8D73E1647} = {C69D878A-A37C-4DBD-8D90-8AF30074E3C0}
+		{AD635AF0-5032-46AE-9CDF-A9014C98038E} = {2E903AB5-E882-49A7-A612-FCCB9F11D540}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {77340858-04C1-4169-93A3-121A82FA6670}

@@ -17,6 +17,11 @@ namespace FreecraftCore
 		where TPayloadWriteType : class where TPayloadReadType : class
 	{
 		/// <summary>
+		/// The endpoint that this proxy application is sitting in the middle of.
+		/// </summary>
+		public NetworkAddressInfo ProxyToEndpointAddress { get; }
+
+		/// <summary>
 		/// Application logger.
 		/// </summary>
 		public ILog Logger { get; }
@@ -25,22 +30,23 @@ namespace FreecraftCore
 
 		private NetworkSerializerServicePair Serializers { get; }
 
-		private IContainer ServiceContainer { get; }
+		protected IContainer ServiceContainer { get; }
 
 		/// <inheritdoc />
-		protected ProxiedTcpServerApplicationBase(NetworkAddressInfo serverAddress, [NotNull] ILog logger, PayloadHandlerRegisterationModules<TPayloadReadType, TPayloadWriteType> handlerModulePair, NetworkSerializerServicePair serializers) 
-			: this(serverAddress, logger, new InPlaceNetworkMessageDispatchingStrategy<TPayloadWriteType, TPayloadReadType>(), handlerModulePair, serializers)
+		protected ProxiedTcpServerApplicationBase(NetworkAddressInfo listenerAddress, [NotNull] NetworkAddressInfo proxyToEndpointAddress,  [NotNull] ILog logger, PayloadHandlerRegisterationModules<TPayloadReadType, TPayloadWriteType> handlerModulePair, NetworkSerializerServicePair serializers) 
+			: this(listenerAddress, proxyToEndpointAddress, logger, new InPlaceAsyncLockedNetworkMessageDispatchingStrategy<TPayloadWriteType, TPayloadReadType>(), handlerModulePair, serializers)
 		{
-
+			
 		}
 
 		/// <inheritdoc />
-		private ProxiedTcpServerApplicationBase([NotNull] NetworkAddressInfo serverAddress, [NotNull] ILog logger, [NotNull] INetworkMessageDispatchingStrategy<TPayloadWriteType, TPayloadReadType> messageHandlingStrategy, [NotNull] PayloadHandlerRegisterationModules<TPayloadReadType, TPayloadWriteType> handlerModulePair, [NotNull] NetworkSerializerServicePair serializers) 
+		private ProxiedTcpServerApplicationBase([NotNull] NetworkAddressInfo serverAddress, [NotNull] NetworkAddressInfo proxyToEndpointAddress, [NotNull] ILog logger, [NotNull] INetworkMessageDispatchingStrategy<TPayloadWriteType, TPayloadReadType> messageHandlingStrategy, [NotNull] PayloadHandlerRegisterationModules<TPayloadReadType, TPayloadWriteType> handlerModulePair, [NotNull] NetworkSerializerServicePair serializers) 
 			: base(serverAddress, messageHandlingStrategy)
 		{
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			HandlerModulePair = handlerModulePair ?? throw new ArgumentNullException(nameof(handlerModulePair));
 			Serializers = serializers ?? throw new ArgumentNullException(nameof(serializers));
+			ProxyToEndpointAddress = proxyToEndpointAddress ?? throw new ArgumentNullException(nameof(proxyToEndpointAddress));
 			ServiceContainer = BuildServiceContainer();
 		}
 
@@ -72,9 +78,7 @@ namespace FreecraftCore
 		{
 			Logger.Info($"Recieved proxy connection from: {details.Address.AddressEndpoint.ToString()}:{details.Address.Port}");
 
-			//TODO: Don't hardcode this
-			//TcpClient proxyClientTcpClient = new TcpClient(Dns.GetHostEntry("logon.wowfeenix.com").HostName, 3724);
-			TcpClient proxyClientTcpClient = new TcpClient("127.0.0.1", 5050);
+			TcpClient proxyClientTcpClient = new TcpClient(ProxyToEndpointAddress.AddressEndpoint.ToString(), ProxyToEndpointAddress.Port);
 
 			//We need to create the proxy client now too
 			var proxyClient = CreateOutgoingSessionPipeline(proxyClientTcpClient);
@@ -115,11 +119,18 @@ namespace FreecraftCore
 					.AsImplementedInterfaces();
 			}))
 			{
-				//TODO: Whenever a client session is created we should create a parallel client connection to the server we're in the middle of
-				connectionSession = lifetimeScope.Resolve<GenericProxiedManagedClientSession<TWriteType, TReadType>>();
+				connectionSession = GenerateClientFromLifetimeScope<TWriteType, TReadType>(lifetimeScope);
 			}
 
 			return connectionSession;
+		}
+
+		protected virtual GenericProxiedManagedClientSession<TWriteType, TReadType> GenerateClientFromLifetimeScope<TWriteType, TReadType>(ILifetimeScope lifetimeScope)
+			where TWriteType : class
+			where TReadType : class
+		{
+			//TODO: Whenever a client session is created we should create a parallel client connection to the server we're in the middle of
+			return lifetimeScope.Resolve<GenericProxiedManagedClientSession<TWriteType, TReadType>>();
 		}
 
 		/// <summary>
@@ -144,28 +155,16 @@ namespace FreecraftCore
 		private IContainer BuildServiceContainer()
 		{
 			ContainerBuilder builder = new ContainerBuilder();
-			
+
 			//TODO: Register serializers somehow
 			//TODO: Handle default handlers
 
 			builder.RegisterInstance(Logger)
 				.As<ILog>();
 
-			//The session handlers
-			builder.RegisterType<MessageHandlerService<TPayloadWriteType, TPayloadReadType, IProxiedMessageContext<TPayloadReadType, TPayloadWriteType>>>()
-				.As<MessageHandlerService<TPayloadWriteType, TPayloadReadType, IProxiedMessageContext<TPayloadReadType, TPayloadWriteType>>>()
-				.SingleInstance();
+			RegisterMessageHandlerServices(builder);
 
-			//The proxy client handlers
-			builder.RegisterType<MessageHandlerService<TPayloadReadType, TPayloadWriteType, IProxiedMessageContext<TPayloadWriteType, TPayloadReadType>>>()
-				.As<MessageHandlerService<TPayloadReadType, TPayloadWriteType, IProxiedMessageContext<TPayloadWriteType, TPayloadReadType>>>()
-				.SingleInstance();
-
-			//Register the incoming and outgoing session Types.
-			builder.RegisterType<GenericProxiedManagedClientSession<TPayloadWriteType, TPayloadReadType>>()
-				.AsSelf();
-			builder.RegisterType<GenericProxiedManagedClientSession<TPayloadReadType, TPayloadWriteType>>()
-				.AsSelf();
+			RegisterSessionTypes(builder);
 
 			//Register the server and client handler modules
 			HandlerModulePair.ClientMessageHandlerModules
@@ -178,6 +177,29 @@ namespace FreecraftCore
 			builder = RegisterHandlerDependencies(builder);
 
 			return builder.Build();
+		}
+
+		protected virtual void RegisterSessionTypes(ContainerBuilder builder)
+		{
+			//Register the incoming and outgoing session Types.
+			builder.RegisterType<GenericProxiedManagedClientSession<TPayloadWriteType, TPayloadReadType>>()
+				.AsSelf();
+
+			builder.RegisterType<GenericProxiedManagedClientSession<TPayloadReadType, TPayloadWriteType>>()
+				.AsSelf();
+		}
+
+		protected virtual void RegisterMessageHandlerServices(ContainerBuilder builder)
+		{
+			//The session handlers
+			builder.RegisterType<MessageHandlerService<TPayloadWriteType, TPayloadReadType, IProxiedMessageContext<TPayloadReadType, TPayloadWriteType>>>()
+				.As<MessageHandlerService<TPayloadWriteType, TPayloadReadType, IProxiedMessageContext<TPayloadReadType, TPayloadWriteType>>>()
+				.SingleInstance();
+
+			//The proxy client handlers
+			builder.RegisterType<MessageHandlerService<TPayloadReadType, TPayloadWriteType, IProxiedMessageContext<TPayloadWriteType, TPayloadReadType>>>()
+				.As<MessageHandlerService<TPayloadReadType, TPayloadWriteType, IProxiedMessageContext<TPayloadWriteType, TPayloadReadType>>>()
+				.SingleInstance();
 		}
 
 		//TODO: We don't need direct dependency on AutoFac. We should use new ASP Core ServiceCollection so others can be used.
@@ -193,7 +215,8 @@ namespace FreecraftCore
 			//So that sessions invoking the disconnection can internally disconnect to
 			networkSession.OnSessionDisconnection += (source, args) => internalNetworkClient.Disconnect();
 
-			var dispatchingStrategy = new InPlaceNetworkMessageDispatchingStrategy<TPayloadReadType, TPayloadWriteType>();
+			//TODO: Better way to syncronize the strategies used?
+			var dispatchingStrategy = new InPlaceAsyncLockedNetworkMessageDispatchingStrategy<TPayloadReadType, TPayloadWriteType>();
 
 			try
 			{
