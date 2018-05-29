@@ -51,17 +51,43 @@ namespace FreecraftCore
 			if(Logger.IsInfoEnabled)
 				Logger.Info($"Client connected to proxy.");
 
-			DefaultSessionPacketCryptoService cryptoService = new DefaultSessionPacketCryptoService(ServiceContainer.Resolve<SRP6SessionKeyStore>(), decryptionKey.ToArray(), encryptionKey.ToArray());
+			SRP6SessionKeyStore keyStore = ServiceContainer.Resolve<SRP6SessionKeyStore>();
+			ICombinedSessionPacketCryptoService cryptoService = BuildIncomingPacketCryptoService(keyStore);
 
 			var wowClientReadServerWrite = new WoWClientReadServerWriteProxyPacketPayloadReaderWriterDecorator<NetworkClientBase, GamePacketPayload, GamePacketPayload, IGamePacketPayload>(clientBase, serializeService, cryptoService);
 
 			return new ManagedNetworkServerClient<WoWClientReadServerWriteProxyPacketPayloadReaderWriterDecorator<NetworkClientBase, GamePacketPayload, GamePacketPayload, IGamePacketPayload>, GamePacketPayload, GamePacketPayload>(wowClientReadServerWrite, Logger);
 		}
 
+		/// <summary>
+		/// Inheritors can override this to implement and return their own crypto strategy.
+		/// </summary>
+		/// <param name="keyStore"></param>
+		/// <returns></returns>
+		protected virtual ICombinedSessionPacketCryptoService BuildIncomingPacketCryptoService([NotNull] SRP6SessionKeyStore keyStore)
+		{
+			if(keyStore == null) throw new ArgumentNullException(nameof(keyStore));
+
+			return new DefaultSessionPacketCryptoService(keyStore, decryptionKey.ToArray(), encryptionKey.ToArray());
+		}
+
+		/// <summary>
+		/// Inheritors can override this to implement and return their own crypto strategy.
+		/// </summary>
+		/// <param name="keyStore"></param>
+		/// <returns></returns>
+		protected virtual ICombinedSessionPacketCryptoService BuildOutgoingPacketCryptoService([NotNull] SRP6SessionKeyStore keyStore)
+		{
+			if(keyStore == null) throw new ArgumentNullException(nameof(keyStore));
+
+			return new DefaultSessionPacketCryptoService(ServiceContainer.Resolve<SRP6SessionKeyStore>(), encryptionKey.ToArray(), decryptionKey.ToArray());
+		}
+
 		/// <inheritdoc />
 		protected override IManagedNetworkClient<GamePacketPayload, GamePacketPayload> BuildOutgoingSessionManagedClient(NetworkClientBase clientBase, INetworkSerializationService serializeService)
 		{
-			DefaultSessionPacketCryptoService cryptoService = new DefaultSessionPacketCryptoService(ServiceContainer.Resolve<SRP6SessionKeyStore>(), encryptionKey.ToArray(), decryptionKey.ToArray());
+			SRP6SessionKeyStore keyStore = ServiceContainer.Resolve<SRP6SessionKeyStore>();
+			ICombinedSessionPacketCryptoService cryptoService = BuildOutgoingPacketCryptoService(keyStore);
 
 			var wowClientReadServerWrite = new WoWClientWriteServerReadProxyPacketPayloadReaderWriterDecorator<NetworkClientBase, GamePacketPayload, GamePacketPayload, IGamePacketPayload>(clientBase, serializeService, cryptoService);
 
