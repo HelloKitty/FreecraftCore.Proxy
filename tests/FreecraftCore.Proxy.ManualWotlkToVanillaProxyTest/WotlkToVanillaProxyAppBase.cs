@@ -40,7 +40,8 @@ namespace FreecraftCore
 		/// <inheritdoc />
 		protected override ContainerBuilder RegisterDefaultHandlers(ContainerBuilder builder)
 		{
-			builder.RegisterType<GameDefaultServerResponseHandler>()
+			builder.RegisterType<WotlkToVanillaGameDefaultServerRequestPayloadHandler>()
+				.As<GameDefaultServerResponseHandler>()
 				.AsImplementedInterfaces()
 				.AsSelf()
 				.SingleInstance();

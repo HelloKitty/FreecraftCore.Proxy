@@ -28,8 +28,6 @@ namespace FreecraftCore
 			if(Logger.IsWarnEnabled)
 				Logger.Warn($"Recieved unproxied Payload: {payload.GetType().Name}:{payload.GetOperationCode()}:{((short)payload.GetOperationCode()):X} on {this.GetType().Name}");
 
-			Console.ReadKey();
-
 			//TODO: We cannot implement the default behavior of the proxy because some information is lost when we recieve an unknown payload.
 			//The information about the opcode is not exposed to the handler so we can just forward unknown messages.
 			//Alternatives is to add a middleware/pipeline extension that forwards "uninteresting" opcodes without even

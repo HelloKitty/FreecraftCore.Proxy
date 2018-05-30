@@ -43,12 +43,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Handlers\Client\WotlkToVanillaLoginCharacterRequestPayloadHandler.cs" />
     <Compile Include="Handlers\Client\WotlkToVanillaUpdateAccountDataPayloadHandler.cs" />
     <Compile Include="Handlers\Client\WotlkToVanillaRealmSplitPayloadHandler.cs" />
     <Compile Include="Handlers\Client\WotlkToVanillaSessionAuthProofRequestPayloadHandler.cs" />
+    <Compile Include="Handlers\Server\WotlkToVanillaGameInitializeTimeRatePayloadHandler.cs" />
     <Compile Include="Handlers\Server\VanillaGameAuthenticateSessionResponsePayloadHandler.cs" />
     <Compile Include="Handlers\Server\GameCharacterListResponsePayloadHandler.cs" />
-    <Compile Include="Handlers\WotlkToVanillaGameDefaultPayloadHandler.cs" />
+    <Compile Include="Handlers\WotlkToVanillaGameDefaultClientRequestPayloadHandler.cs" />
+    <Compile Include="Handlers\WotlkToVanillaGameDefaultServerRequestPayloadHandler.cs" />
     <Compile Include="VanillaWoWClientReadServerWriteProxyPacketPayloadReaderWriterDecorator.cs" />
     <Compile Include="Crypto\IncomingWoltkToVanillaCryptoService.cs" />
     <Compile Include="Handlers\Server\WotlkToVanillaGameAuthChallengeEventPayloadHandler.cs" />
@@ -82,16 +85,16 @@
       <Version>2.1.3</Version>
     </PackageReference>
     <PackageReference Include="FreecraftCore.API.Common">
-      <Version>1.0.33</Version>
+      <Version>1.0.39</Version>
     </PackageReference>
     <PackageReference Include="FreecraftCore.Packet.Game">
-      <Version>1.0.33</Version>
+      <Version>1.0.39</Version>
     </PackageReference>
     <PackageReference Include="FreecraftCore.Packet.Game.1_12_1">
-      <Version>1.0.33</Version>
+      <Version>1.0.39</Version>
     </PackageReference>
     <PackageReference Include="FreecraftCore.Packet.Game.Stubs">
-      <Version>1.0.33</Version>
+      <Version>1.0.39</Version>
     </PackageReference>
     <PackageReference Include="FreecraftCore.Serializer">
       <Version>3.0.30</Version>
