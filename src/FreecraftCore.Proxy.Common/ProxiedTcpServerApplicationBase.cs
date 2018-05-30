@@ -176,6 +176,9 @@ namespace FreecraftCore
 
 			builder = RegisterHandlerDependencies(builder);
 
+			//The default handlers (Just forwards)
+			builder = RegisterDefaultHandlers(builder);
+
 			return builder.Build();
 		}
 
@@ -243,5 +246,7 @@ namespace FreecraftCore
 			//TODO: Should we tell the client something when it ends?
 			networkSession.DisconnectClientSession();
 		}
+
+		protected abstract ContainerBuilder RegisterDefaultHandlers(ContainerBuilder builder);
 	}
 }

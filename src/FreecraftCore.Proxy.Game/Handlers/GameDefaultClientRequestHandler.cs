@@ -9,9 +9,9 @@ using JetBrains.Annotations;
 
 namespace FreecraftCore
 {
-	public sealed class GameDefaultClientRequestHandler : IPeerPayloadSpecificMessageHandler<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>
+	public class GameDefaultClientRequestHandler : IPeerPayloadSpecificMessageHandler<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>
 	{
-		private ILog Logger { get; }
+		protected ILog Logger { get; }
 
 		/// <inheritdoc />
 		public GameDefaultClientRequestHandler([NotNull] ILog logger)
@@ -23,10 +23,12 @@ namespace FreecraftCore
 
 #pragma warning disable AsyncFixer01 // Unnecessary async/await usage
 		/// <inheritdoc />
-		public async Task HandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, GamePacketPayload payload)
+		public virtual async Task HandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, GamePacketPayload payload)
 		{
 			if(Logger.IsWarnEnabled)
-				Logger.Warn($"Recieved unproxied Payload: {payload.GetType().Name} on {this.GetType().Name}");
+				Logger.Warn($"Recieved unproxied Payload: {payload.GetType().Name}:{payload.GetOperationCode()}:{((short)payload.GetOperationCode()):X} on {this.GetType().Name}");
+
+			Console.ReadKey();
 
 			//TODO: We cannot implement the default behavior of the proxy because some information is lost when we recieve an unknown payload.
 			//The information about the opcode is not exposed to the handler so we can just forward unknown messages.

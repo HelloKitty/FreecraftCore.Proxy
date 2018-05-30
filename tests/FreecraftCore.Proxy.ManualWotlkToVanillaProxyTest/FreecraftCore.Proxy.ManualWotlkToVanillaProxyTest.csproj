@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A2773289-F9A3-4FD5-B582-5E5DF1EDF820}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>FreecraftCore.Proxy.ManualWotlkToVanillaProxyTest</RootNamespace>
+    <AssemblyName>FreecraftCore.Proxy.ManualWotlkToVanillaProxyTest</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>7.2</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Handlers\Client\WotlkToVanillaRealmSplitPayloadHandler.cs" />
+    <Compile Include="Handlers\Client\WotlkToVanillaSessionAuthProofRequestPayloadHandler.cs" />
+    <Compile Include="Handlers\Server\VanillaGameAuthenticateSessionResponsePayloadHandler.cs" />
+    <Compile Include="Handlers\Server\GameCharacterListResponsePayloadHandler.cs" />
+    <Compile Include="Handlers\WotlkToVanillaGameDefaultPayloadHandler.cs" />
+    <Compile Include="VanillaWoWClientReadServerWriteProxyPacketPayloadReaderWriterDecorator.cs" />
+    <Compile Include="Crypto\IncomingWoltkToVanillaCryptoService.cs" />
+    <Compile Include="Handlers\Server\WotlkToVanillaGameAuthChallengeEventPayloadHandler.cs" />
+    <Compile Include="Handlers\GameTestHandlerRegisterationModule.cs" />
+    <Compile Include="Handlers\ManualGameProxyTestClientMessageHandlerRegisterationModule.cs" />
+    <Compile Include="Handlers\ManualGameProxyTestSessionMessageHandlerRegisterationModule.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\WotlkToVanillaGameTestNetworkSerializers.cs" />
+    <Compile Include="WotlkToVanillaProxyAppBase.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\FreecraftCore.Proxy.Common\FreecraftCore.Proxy.Common.csproj">
+      <Project>{F10D37E9-D303-47FE-8E2F-62BB19D9681B}</Project>
+      <Name>FreecraftCore.Proxy.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\FreecraftCore.Proxy.Game\FreecraftCore.Proxy.Game.csproj">
+      <Project>{4A8F8533-95A0-4815-BDB4-79D8D73E1647}</Project>
+      <Name>FreecraftCore.Proxy.Game</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FreecraftCore.Proxy.ManualAuthProxyTest\FreecraftCore.Proxy.ManualAuthProxyTest.csproj">
+      <Project>{cdea10bb-764a-44eb-b6a2-229cd68e0910}</Project>
+      <Name>FreecraftCore.Proxy.ManualAuthProxyTest</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="fasterflect">
+      <Version>2.1.3</Version>
+    </PackageReference>
+    <PackageReference Include="FreecraftCore.API.Common">
+      <Version>1.0.33</Version>
+    </PackageReference>
+    <PackageReference Include="FreecraftCore.Packet.Game">
+      <Version>1.0.33</Version>
+    </PackageReference>
+    <PackageReference Include="FreecraftCore.Packet.Game.1_12_1">
+      <Version>1.0.33</Version>
+    </PackageReference>
+    <PackageReference Include="FreecraftCore.Packet.Game.Stubs">
+      <Version>1.0.33</Version>
+    </PackageReference>
+    <PackageReference Include="FreecraftCore.Serializer">
+      <Version>3.0.30</Version>
+    </PackageReference>
+    <PackageReference Include="GladNet3.Crypto.API">
+      <Version>3.0.34</Version>
+    </PackageReference>
+    <PackageReference Include="GladNet3.Handler.API">
+      <Version>3.0.34</Version>
+    </PackageReference>
+    <PackageReference Include="MemorySharp">
+      <Version>1.2.0</Version>
+    </PackageReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

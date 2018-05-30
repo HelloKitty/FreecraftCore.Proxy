@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FreecraftCore.Crypto;
 using GladNet;
+using ICryptoServiceProvider = FreecraftCore.Crypto.ICryptoServiceProvider;
 
 namespace FreecraftCore
 {
@@ -15,8 +16,8 @@ namespace FreecraftCore
 		/// </summary>
 		bool isInitialized { get; }
 
-		SessionPacketCryptoService EncryptionService { get; }
+		ICryptoServiceProvider EncryptionService { get; }
 
-		SessionPacketCryptoService DecryptionService { get; }
+		ICryptoServiceProvider DecryptionService { get; }
 	}
 }

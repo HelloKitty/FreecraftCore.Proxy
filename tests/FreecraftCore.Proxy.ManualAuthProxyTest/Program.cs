@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Castle.Core.Logging;
@@ -17,8 +18,9 @@ namespace FreecraftCore.Auth
 			authHandlerModules.AddServerHandlerModule(new ManualAuthProxyTestSessionMessageHandlerRegisterationModule());
 			authHandlerModules.AddClientHanderModule(new ManualAuthProxyTestClientMessageHandlerRegisterationModule());
 
-			AuthenticationProxyApplicationBase appBase = new AuthenticationProxyApplicationBase(new NetworkAddressInfo(IPAddress.Parse("127.0.0.1"), 3724), 
-				new NetworkAddressInfo(IPAddress.Parse("127.0.0.1"), 5050), new FreecraftCore.ConsoleLogger(LogLevel.All), authHandlerModules, 
+			AuthenticationProxyApplicationBase appBase = new AuthenticationProxyApplicationBase(new NetworkAddressInfo(IPAddress.Parse("127.0.0.1"), 3724),
+				//new NetworkAddressInfo(Dns.GetHostAddresses("logon.wowfeenix.com").First(), 3724), new FreecraftCore.ConsoleLogger(LogLevel.All), authHandlerModules,
+				new NetworkAddressInfo(IPAddress.Parse("127.0.0.1"), 5050), new FreecraftCore.ConsoleLogger(LogLevel.All), authHandlerModules,
 				new AuthTestNetworkSerializers());
 
 			if(!appBase.StartServer())

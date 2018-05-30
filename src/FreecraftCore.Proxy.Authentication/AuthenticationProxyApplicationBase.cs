@@ -51,6 +51,12 @@ namespace FreecraftCore
 		/// <inheritdoc />
 		protected override ContainerBuilder RegisterHandlerDependencies(ContainerBuilder builder)
 		{
+			return builder;
+		}
+
+		/// <inheritdoc />
+		protected override ContainerBuilder RegisterDefaultHandlers(ContainerBuilder builder)
+		{
 			//The default handlers (Just forwards)
 			builder.RegisterType<AuthDefaultServerResponseHandler>()
 				.AsImplementedInterfaces()

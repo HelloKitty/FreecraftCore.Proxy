@@ -21,7 +21,7 @@ namespace FreecraftCore
 	/// <typeparam name="TWritePayloadBaseType"></typeparam>
 	/// <typeparam name="TReadPayloadBaseType"></typeparam>
 	/// <typeparam name="TPayloadConstraintType">The constraint requirement for </typeparam>
-	public sealed class WoWClientReadServerWriteProxyPacketPayloadReaderWriterDecorator<TClientType, TReadPayloadBaseType, TWritePayloadBaseType, TPayloadConstraintType> : NetworkClientBase,
+	public class WoWClientReadServerWriteProxyPacketPayloadReaderWriterDecorator<TClientType, TReadPayloadBaseType, TWritePayloadBaseType, TPayloadConstraintType> : NetworkClientBase,
 		INetworkMessageClient<TReadPayloadBaseType, TWritePayloadBaseType>
 		where TClientType : NetworkClientBase
 		where TReadPayloadBaseType : class, TPayloadConstraintType
@@ -106,10 +106,8 @@ namespace FreecraftCore
 		}
 
 		/// <inheritdoc />
-		public async Task WriteAsync(TWritePayloadBaseType payload)
+		public virtual async Task WriteAsync(TWritePayloadBaseType payload)
 		{
-			Console.WriteLine($"About to send payload to the client.");
-
 			try
 			{
 				//Serializer the payload first so we can build the header

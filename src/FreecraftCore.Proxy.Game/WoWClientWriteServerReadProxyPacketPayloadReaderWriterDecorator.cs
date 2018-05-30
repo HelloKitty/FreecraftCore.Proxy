@@ -21,7 +21,7 @@ namespace FreecraftCore
 	/// <typeparam name="TWritePayloadBaseType"></typeparam>
 	/// <typeparam name="TReadPayloadBaseType"></typeparam>
 	/// <typeparam name="TPayloadConstraintType">The constraint requirement for </typeparam>
-	public sealed class WoWClientWriteServerReadProxyPacketPayloadReaderWriterDecorator<TClientType, TReadPayloadBaseType, TWritePayloadBaseType, TPayloadConstraintType> : NetworkClientBase,
+	public class WoWClientWriteServerReadProxyPacketPayloadReaderWriterDecorator<TClientType, TReadPayloadBaseType, TWritePayloadBaseType, TPayloadConstraintType> : NetworkClientBase,
 		INetworkMessageClient<TReadPayloadBaseType, TWritePayloadBaseType>
 		where TClientType : NetworkClientBase
 		where TReadPayloadBaseType : class, TPayloadConstraintType
@@ -30,7 +30,7 @@ namespace FreecraftCore
 		/// <summary>
 		/// The decorated client.
 		/// </summary>
-		private TClientType DecoratedClient { get; }
+		protected TClientType DecoratedClient { get; }
 
 		/// <summary>
 		/// Service that readers and writers packet headers.
@@ -39,24 +39,24 @@ namespace FreecraftCore
 		/// <summary>
 		/// The serializer service.
 		/// </summary>
-		private INetworkSerializationService Serializer { get; }
+		protected INetworkSerializationService Serializer { get; }
 
 		public ICombinedSessionPacketCryptoService CryptoService { get; }
 
 		/// <summary>
 		/// Thread specific buffer used to deserialize the packet header bytes into.
 		/// </summary>
-		private byte[] PacketPayloadReadBuffer { get; }
+		protected byte[] PacketPayloadReadBuffer { get; }
 
 		/// <summary>
 		/// Async read syncronization object.
 		/// </summary>
-		private readonly AsyncLock readSynObj = new AsyncLock();
+		protected readonly AsyncLock readSynObj = new AsyncLock();
 
 		/// <summary>
 		/// Async write syncronization object.
 		/// </summary>
-		private readonly AsyncLock writeSynObj = new AsyncLock();
+		protected readonly AsyncLock writeSynObj = new AsyncLock();
 
 		public WoWClientWriteServerReadProxyPacketPayloadReaderWriterDecorator(TClientType decoratedClient, INetworkSerializationService serializer, ICombinedSessionPacketCryptoService cryptoService, int payloadBufferSize = 30000)
 		{
@@ -106,7 +106,7 @@ namespace FreecraftCore
 		}
 
 		/// <inheritdoc />
-		public async Task WriteAsync(TWritePayloadBaseType payload)
+		public virtual async Task WriteAsync(TWritePayloadBaseType payload)
 		{
 			//Serializer the payload first so we can build the header
 			byte[] payloadData = Serializer.Serialize(payload);
@@ -145,7 +145,7 @@ namespace FreecraftCore
 			return DecoratedClient.ReadAsync(buffer, start, count, token);
 		}
 
-		public async Task<NetworkIncomingMessage<TReadPayloadBaseType>> ReadAsync(CancellationToken token)
+		public virtual async Task<NetworkIncomingMessage<TReadPayloadBaseType>> ReadAsync(CancellationToken token)
 		{
 			IPacketHeader header = null;
 			TReadPayloadBaseType payload = null;
@@ -190,7 +190,7 @@ namespace FreecraftCore
 			return new NetworkIncomingMessage<TReadPayloadBaseType>(header, payload);
 		}
 
-		private async Task<IPacketHeader> BuildHeaderWithDecryption(CancellationToken token)
+		protected virtual async Task<IPacketHeader> BuildHeaderWithDecryption(CancellationToken token)
 		{
 			//Read first byte so we can see packet type
 			await ReadAsync(PacketPayloadReadBuffer, 0, 1, token)

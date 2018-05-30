@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using FreecraftCore.Crypto;
 using JetBrains.Annotations;
 
-namespace FreecraftCore
+namespace FreecraftCore.Crypto
 {
 	public sealed class DefaultSessionPacketCryptoService : ICombinedSessionPacketCryptoService
 	{
@@ -27,18 +27,18 @@ namespace FreecraftCore
 			EncryptionHmacKey = encryptionHmacKey;
 			DecryptionHmacKey = decryptionHmacKey;
 
-			LazyEncryptionService = new Lazy<SessionPacketCryptoService>(() => new SessionPacketCryptoService(this.KeyStore.SessionKey.ToArray(), true, encryptionHmacKey), true);
-			LazyDecryptionService = new Lazy<SessionPacketCryptoService>(() => new SessionPacketCryptoService(this.KeyStore.SessionKey.ToArray(), false, decryptionHmacKey), true);
+			LazyEncryptionService = new Lazy<ICryptoServiceProvider>(() => new SessionARC4NPacketCryptoService(this.KeyStore.SessionKey.ToArray(), true, encryptionHmacKey), true);
+			LazyDecryptionService = new Lazy<ICryptoServiceProvider>(() => new SessionARC4NPacketCryptoService(this.KeyStore.SessionKey.ToArray(), false, decryptionHmacKey), true);
 		}
 
-		private Lazy<SessionPacketCryptoService> LazyEncryptionService { get; }
+		private Lazy<ICryptoServiceProvider> LazyEncryptionService { get; }
 
-		private Lazy<SessionPacketCryptoService> LazyDecryptionService { get; }
-
-		/// <inheritdoc />
-		public SessionPacketCryptoService EncryptionService => LazyEncryptionService.Value;
+		private Lazy<ICryptoServiceProvider> LazyDecryptionService { get; }
 
 		/// <inheritdoc />
-		public SessionPacketCryptoService DecryptionService => LazyDecryptionService.Value;
+		public ICryptoServiceProvider EncryptionService => LazyEncryptionService.Value;
+
+		/// <inheritdoc />
+		public ICryptoServiceProvider DecryptionService => LazyDecryptionService.Value;
 	}
 }

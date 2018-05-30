@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using Common.Logging;
+using FreecraftCore.Crypto;
 using FreecraftCore.Serializer;
 using GladNet;
 using JetBrains.Annotations;
@@ -146,7 +147,16 @@ namespace FreecraftCore
 		/// <inheritdoc />
 		protected override ContainerBuilder RegisterHandlerDependencies(ContainerBuilder builder)
 		{
-			//The default handlers (Just forwards)
+			builder.RegisterType<SRP6SessionKeyStore>()
+				.AsSelf()
+				.AsImplementedInterfaces()
+				.SingleInstance();
+
+			return builder;
+		}
+
+		protected override ContainerBuilder RegisterDefaultHandlers(ContainerBuilder builder)
+		{
 			builder.RegisterType<GameDefaultServerResponseHandler>()
 				.AsImplementedInterfaces()
 				.AsSelf()
@@ -155,11 +165,6 @@ namespace FreecraftCore
 			builder.RegisterType<GameDefaultClientRequestHandler>()
 				.AsImplementedInterfaces()
 				.AsSelf()
-				.SingleInstance();
-
-			builder.RegisterType<SRP6SessionKeyStore>()
-				.AsSelf()
-				.AsImplementedInterfaces()
 				.SingleInstance();
 
 			return builder;
