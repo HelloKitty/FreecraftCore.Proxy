@@ -43,7 +43,7 @@ namespace FreecraftCore
 
 		private static string PacketLogPath()
 		{
-			return $"Packet/{typeof(TUnimplementedPacketPayloadType).GetCustomAttribute<GamePayloadOperationCodeAttribute>().OperationCode})";
+			return $"Packet/{typeof(TUnimplementedPacketPayloadType).GetCustomAttribute<GamePayloadOperationCodeAttribute>().OperationCode}";
 		}
 
 		/// <inheritdoc />
