@@ -35,17 +35,35 @@ namespace FreecraftCore
 			foreach(var opcode in codes)
 				opcodeSet.Add(opcode);
 
-			GamePacketMetadataMarker
-				.GamePacketPayloadTypes
-				.Concat(GamePacketStubMetadataMarker.GamePacketPayloadStubTypes)
-				.Where(t => opcodeSet.Contains(t.Attribute<GamePayloadOperationCodeAttribute>().OperationCode))
+			GamePacketStubMetadataMarker
+				.GamePacketPayloadStubTypes
+				.Where(t =>
+				{
+					NetworkOperationCode code = t.Attribute<GamePayloadOperationCodeAttribute>().OperationCode;
+
+					//if it's not a vanilla or shared packet
+					return opcodeSet.Contains(code) && GamePacketMetadataMarker.UnimplementedOperationCodes.Value.Contains(code);
+				})
+				.Concat(GamePacketMetadataMarker.GamePacketPayloadTypes.Where(t => opcodeSet.Contains(t.Attribute<GamePayloadOperationCodeAttribute>().OperationCode)))
 				.Concat(VanillaGamePacketMetadataMarker.VanillaGamePacketPayloadTypes)
+				//TODO: Disable this when you need
+				//.Where(t => t != typeof(SMSG_COMPRESSED_UPDATE_OBJECT_Payload_Vanilla) && t != typeof(SMSG_UPDATE_OBJECT_Payload_Vanilla))
 				.ToList()
-				.ForEach(t => serializer.RegisterType(t));
+				.ForEach(t =>
+				{
+					if(!(typeof(IUnimplementedGamePacketPayload).IsAssignableFrom(t)))
+						Console.WriteLine($"Registering Type: {t.Name}");
+
+					serializer.RegisterType(t);
+				});
 
 			//Also the header types
 			serializer.RegisterType<ServerPacketHeader>();
 			serializer.RegisterType<OutgoingClientPacketHeader>();
+
+			//TODO: Uncomment for dumping
+			//serializer.RegisterType(typeof(SMSG_COMPRESSED_UPDATE_OBJECT_DTO_PROXY));
+			//serializer.RegisterType(typeof(SMSG_UPDATE_OBJECT_DTO_PROXY));
 
 			serializer.Compile();
 
@@ -58,16 +76,12 @@ namespace FreecraftCore
 
 			GamePacketMetadataMarker
 				.SerializableTypes
+				.Concat(GamePacketMetadataMarker.GamePacketPayloadTypes)
 				.ToList()
 				.ForEach(t => serializer.RegisterType(t));
 
-			//This will register dynamic DTO that have a byte[] data field allowing unknown packets to be sent
-			//over the network to client/server. FreecraftCore.Serializer does not support serializing default types
-			//so this is the work around
-			//Registeration can be slow.
-			//foreach(Type t in GamePacketMetadataMarker.GamePacketPayloadTypesWithDynamicProxies.Value)
-			//	serializer.RegisterType(t);
-			foreach(Type t in GamePacketStubMetadataMarker.GamePacketPayloadStubTypes)
+			//Register all unimplemented stubs
+			foreach(Type t in GamePacketStubMetadataMarker.GamePacketPayloadStubTypes.Where(t => GamePacketMetadataMarker.UnimplementedOperationCodes.Value.Contains(t.GetCustomAttribute<GamePayloadOperationCodeAttribute>().OperationCode)))
 				serializer.RegisterType(t);
 
 			//Also the header types

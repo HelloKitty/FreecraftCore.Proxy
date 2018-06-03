@@ -19,6 +19,7 @@ namespace FreecraftCore
 			= new HashSet<NetworkOperationCode>()
 			{
 				NetworkOperationCode.CMSG_READY_FOR_ACCOUNT_DATA_TIMES,
+				NetworkOperationCode.CMSG_WARDEN_DATA
 			};
 
 		/// <inheritdoc />

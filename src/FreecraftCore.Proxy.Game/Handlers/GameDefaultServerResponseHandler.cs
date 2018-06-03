@@ -32,8 +32,10 @@ namespace FreecraftCore
 			//The information about the opcode is not exposed to the handler so we can just forward unknown messages.
 			//Alternatives is to add a middleware/pipeline extension that forwards "uninteresting" opcodes without even
 			//handling them.
+			Console.ReadKey();
 
-			if(payload is UnknownGamePayload)
+			//TODO: Remove object update supression
+			if(payload is UnknownGamePayload) //|| payload.GetOperationCode() == NetworkOperationCode.SMSG_COMPRESSED_UPDATE_OBJECT)
 				return;
 
 			//TODO: Check if it is default payload. We don't want to forward defaults/unknowns

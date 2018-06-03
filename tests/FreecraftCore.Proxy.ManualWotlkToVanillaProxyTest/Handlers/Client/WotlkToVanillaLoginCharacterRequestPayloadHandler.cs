@@ -32,11 +32,22 @@ namespace FreecraftCore
 			//Wotlk expects a lot of extra packets to be sent that 1.12.1 doesn't send
 			//Forward the login request after these
 
+			//3.3.5 TC sends in the following order for minimum login
+			//Dungeon_Difficulty
+			//Login_Verify_World
+			//SMSG_MOTD
+			//Guild stuff
+			//Learned_Dance_Moves
+			//SMSG_COMPRESSED_UPDATE_OBJECT
+			//SMSG_COMPRESSED_UPDATE_OBJECT
+			//CMSG_PLAYED_TIME
+
+			await context.PayloadSendService.SendMessage(new SMSG_INSTANCE_DIFFICULTY_PAYLOAD());
 			await context.PayloadSendService.SendMessage(new SMSG_FEATURE_SYSTEM_STATUS_PAYLOAD(false));
 			//Do we need to send MOTD? I didn't test not sending. 1.12.1 doesn't have it.
-			await context.PayloadSendService.SendMessage(new SMSG_MOTD_PAYLOAD(new string[1] { "Powered by Glader's FreecraftCore" }));
+			//await context.PayloadSendService.SendMessage(new SMSG_MOTD_PAYLOAD(new string[1] { "Powered by Glader's FreecraftCore" }));
 			await context.PayloadSendService.SendMessage(new SMSG_LEARNED_DANCE_MOVES_PAYLOAD());
-			await context.PayloadSendService.SendMessage(new SMSG_INSTANCE_DIFFICULTY_PAYLOAD()); //default difficulty
+			//await context.PayloadSendService.SendMessage(new SMSG_INSTANCE_DIFFICULTY_PAYLOAD()); //default difficulty
 			await context.PayloadSendService.SendMessage(new SMSG_CONTACT_LIST_PAYLOAD()); //send empty contact list
 
 			//Forward the loginrequest and we will transform all the server payloads to the wotlk version as they come back in

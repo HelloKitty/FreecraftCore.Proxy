@@ -47,6 +47,10 @@ namespace FreecraftCore
 				NetworkOperationCode.SMSG_EQUIPMENT_SET_LIST,
 				NetworkOperationCode.SMSG_LOGIN_SETTIMESPEED,
 				NetworkOperationCode.SMSG_SET_FORCED_REACTIONS,
+
+				//This packet actually must be implemented properly for the 3.3.5 client
+				//it is the most critical packet and it will not go past the loading
+				//bar without it.
 				NetworkOperationCode.SMSG_COMPRESSED_UPDATE_OBJECT,
 				NetworkOperationCode.SMSG_UPDATE_WORLD_STATE,
 				NetworkOperationCode.SMSG_TIME_SYNC_REQ,
@@ -62,30 +66,46 @@ namespace FreecraftCore
 
 				//Vanilla 1.12.1 sends IGNORE_LIST opcode as this. So we discard for now
 				//Until we can deal with this.
-				NetworkOperationCode.CMSG_SET_CONTACT_NOTES
+				NetworkOperationCode.CMSG_SET_CONTACT_NOTES,
+
+				NetworkOperationCode.CMSG_WARDEN_DATA,
+				NetworkOperationCode.SMSG_WARDEN_DATA,
+
+				//TODO: We should implement. Otherwise we have no binds
+				NetworkOperationCode.SMSG_ACTION_BUTTONS,
+
+				//TODO: Research what this is.
+				NetworkOperationCode.SMSG_QUEST_FORCE_REMOVE,
 			};
 
 		/// <inheritdoc />
 		public WotlkToVanillaGameDefaultServerRequestPayloadHandler([NotNull] ILog logger)
 			: base(logger)
 		{
-
+			//Disable all spell stuff for now.
+			foreach(var opCode in Enum.GetNames(typeof(NetworkOperationCode)).Where(s => s.Contains("SPELL")).Select(s => (NetworkOperationCode)Enum.Parse(typeof(NetworkOperationCode), s)))
+				this.OpCodeBlackList.Add(opCode);
 		}
 
 #pragma warning disable AsyncFixer01 // Unnecessary async/await usage
 		/// <inheritdoc />
 		public override async Task HandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, GamePacketPayload payload)
 		{
-			if(Logger.IsWarnEnabled)
-				Logger.Warn($"Recieved unproxied Payload: {payload.GetType().Name} on {this.GetType().Name}");
+			//if(Logger.IsWarnEnabled)
+			//	Logger.Warn($"Recieved unproxied Payload: {payload.GetType().Name} on {this.GetType().Name}");
 
 			if(payload is UnknownGamePayload)
+				return;
+
+			//TODO: Remove this test stuff
+			if(payload.GetOperationCode() != NetworkOperationCode.SMSG_AUTH_RESPONSE &&
+				payload.GetOperationCode() != NetworkOperationCode.SMSG_LOGIN_VERIFY_WORLD)
 				return;
 
 			//Since we're connected to a vanilla realm we, at least for now, want to discard unknown opcode payloads
 			if((short)payload.GetOperationCode() > 0x41F || OpCodeBlackList.Contains(payload.GetOperationCode()))
 			{
-				Logger.Warn($"Recieved OpCode: {payload.GetOperationCode()} from server. Discared for now because unimplemented or wotlk doesn't support.");
+			//	Logger.Warn($"Recieved OpCode: {payload.GetOperationCode()} from server. Discared for now because unimplemented or wotlk doesn't support.");
 				return;
 			}
 

@@ -68,7 +68,8 @@ namespace FreecraftCore
 				await fs.WriteAsync(payload.Data, 0, payload.Data.Length);
 			}
 
-			await OnForwardingPayload(context, payload);
+			if(ShouldForward)
+				await OnForwardingPayload(context, payload);
 		}
 
 		/// <summary>
