@@ -6,7 +6,9 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Common.Logging;
 using GladNet;
+using JetBrains.Annotations;
 using Nito.AsyncEx;
 using Reinterpret.Net;
 
@@ -58,7 +60,9 @@ namespace FreecraftCore
 		/// </summary>
 		private readonly AsyncLock writeSynObj = new AsyncLock();
 
-		public WoWClientReadServerWriteProxyPacketPayloadReaderWriterDecorator(TClientType decoratedClient, INetworkSerializationService serializer, ICombinedSessionPacketCryptoService cryptoService, int payloadBufferSize = 30000)
+		private ILog Logger { get; }
+
+		public WoWClientReadServerWriteProxyPacketPayloadReaderWriterDecorator(TClientType decoratedClient, INetworkSerializationService serializer, ICombinedSessionPacketCryptoService cryptoService, [NotNull] ILog logger, int payloadBufferSize = 30000)
 		{
 			if(decoratedClient == null) throw new ArgumentNullException(nameof(decoratedClient));
 			if(serializer == null) throw new ArgumentNullException(nameof(serializer));
@@ -67,6 +71,7 @@ namespace FreecraftCore
 			DecoratedClient = decoratedClient;
 			Serializer = serializer;
 			CryptoService = cryptoService;
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
 			//One of the lobby packets is 14,000 bytes. We may even need bigger.
 			PacketPayloadReadBuffer = new byte[payloadBufferSize]; //TODO: Do we need a larger buffer for any packets?
@@ -139,7 +144,8 @@ namespace FreecraftCore
 			}
 			catch(Exception e)
 			{
-				Console.WriteLine(e);
+				if(Logger.IsErrorEnabled)
+					Logger.Error($"Client proxy encountered Exception: {e.Message} \n\n {e.StackTrace}");
 				throw;
 			}
 		}
@@ -166,11 +172,12 @@ namespace FreecraftCore
 
 				OutgoingClientPacketHeader clientHeader = Serializer.Deserialize<OutgoingClientPacketHeader>(PacketPayloadReadBuffer, 0, 6);
 
-				Console.WriteLine($"New ClientHeader: OpCode: {clientHeader.OperationCode} PacketSize: {clientHeader.PacketSize} PayloadSize: {clientHeader.PayloadSize}");
+				//TODO: Enable this logging on Debug
+				//Console.WriteLine($"New ClientHeader: OpCode: {clientHeader.OperationCode} PacketSize: {clientHeader.PacketSize} PayloadSize: {clientHeader.PayloadSize}");
 
 				header = clientHeader;
 
-				Console.WriteLine($"Recieved OpCode: {clientHeader.OperationCode}:{(ushort)clientHeader.OperationCode} from client Encrypted:{CryptoService.isInitialized}");
+				//Console.WriteLine($"Recieved OpCode: {clientHeader.OperationCode}:{(ushort)clientHeader.OperationCode} from client Encrypted:{CryptoService.isInitialized}");
 
 				//If the header is null it means the socket disconnected
 				if(header == null)

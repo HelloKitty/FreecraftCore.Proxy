@@ -27,7 +27,7 @@ namespace FreecraftCore
 		}
 
 		/// <inheritdoc />
-		public override Task HandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, SMSG_LOGIN_SETTIMESPEED_PAYLOAD_VANILLIA payload)
+		public override Task OnHandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, SMSG_LOGIN_SETTIMESPEED_PAYLOAD_VANILLIA payload)
 		{
 			//We just forward the proper format to the wotlk client.
 			return context.ProxyConnection.SendMessage(new SMSG_LOGIN_SETTIMESPEED_PAYLOAD(payload.GameTimeStamp, payload.GameTickRate));

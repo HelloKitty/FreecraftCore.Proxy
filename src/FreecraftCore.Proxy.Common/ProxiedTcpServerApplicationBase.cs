@@ -221,24 +221,25 @@ namespace FreecraftCore
 			//TODO: Better way to syncronize the strategies used?
 			var dispatchingStrategy = new InPlaceAsyncLockedNetworkMessageDispatchingStrategy<TPayloadReadType, TPayloadWriteType>();
 
-			try
+			while(client.Connected && internalNetworkClient.isConnected)
 			{
-				while(client.Connected && internalNetworkClient.isConnected)
-				{
-					NetworkIncomingMessage<TPayloadWriteType> message = await internalNetworkClient.ReadMessageAsync(CancellationToken.None)
-						.ConfigureAwait(false);
+				NetworkIncomingMessage<TPayloadWriteType> message = await internalNetworkClient.ReadMessageAsync(CancellationToken.None)
+					.ConfigureAwait(false);
 
+				//We don't want to stop the client just because an exception occurred.
+				try
+				{
 					//TODO: This will work for World of Warcraft since it requires no more than one packet
 					//from the same client be handled at one time. However it limits throughput and maybe we should
 					//handle this at a different level instead. 
 					await dispatchingStrategy.DispatchNetworkMessage(new SessionMessageContext<TPayloadReadType, TPayloadWriteType>(networkSession, message))
 						.ConfigureAwait(false);
 				}
-			}
-			catch(Exception e)
-			{
-				//TODO: Remove this console log
-				Console.WriteLine($"[Error]: {e.Message}\n\nStack: {e.StackTrace}");
+				catch(Exception e)
+				{
+					//TODO: Remove this console log
+					Logger.Error($"[Error]: {e.Message}\n\nStack: {e.StackTrace}");
+				}
 			}
 
 			client.Dispose();

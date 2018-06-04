@@ -91,8 +91,8 @@ namespace FreecraftCore
 		/// <inheritdoc />
 		public override async Task HandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, GamePacketPayload payload)
 		{
-			//if(Logger.IsWarnEnabled)
-			//	Logger.Warn($"Recieved unproxied Payload: {payload.GetType().Name} on {this.GetType().Name}");
+			if(Logger.IsWarnEnabled)
+				Logger.Warn($"Recieved unproxied Payload: {payload.GetOperationCode()}:{payload.GetType().Name}");
 
 			if(payload is UnknownGamePayload)
 				return;

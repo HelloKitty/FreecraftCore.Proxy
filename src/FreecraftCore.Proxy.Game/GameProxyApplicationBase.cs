@@ -55,7 +55,7 @@ namespace FreecraftCore
 			SRP6SessionKeyStore keyStore = ServiceContainer.Resolve<SRP6SessionKeyStore>();
 			ICombinedSessionPacketCryptoService cryptoService = BuildIncomingPacketCryptoService(keyStore);
 
-			var wowClientReadServerWrite = new WoWClientReadServerWriteProxyPacketPayloadReaderWriterDecorator<NetworkClientBase, GamePacketPayload, GamePacketPayload, IGamePacketPayload>(clientBase, serializeService, cryptoService);
+			var wowClientReadServerWrite = new WoWClientReadServerWriteProxyPacketPayloadReaderWriterDecorator<NetworkClientBase, GamePacketPayload, GamePacketPayload, IGamePacketPayload>(clientBase, serializeService, cryptoService, Logger);
 
 			return new ManagedNetworkServerClient<WoWClientReadServerWriteProxyPacketPayloadReaderWriterDecorator<NetworkClientBase, GamePacketPayload, GamePacketPayload, IGamePacketPayload>, GamePacketPayload, GamePacketPayload>(wowClientReadServerWrite, Logger);
 		}
@@ -122,8 +122,6 @@ namespace FreecraftCore
 						= context.ResolveNamed<IEnumerable<IPeerMessageHandler<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>>>("Server")
 							.ToArray();
 
-					Console.WriteLine($"Found: {handlers.Length} many server handlers.");
-
 					return new MessageHandlerService<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>(handlers, context.Resolve<GameDefaultServerResponseHandler>());
 			})
 				.Named<MessageHandlerService<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>>("Server")
@@ -135,8 +133,6 @@ namespace FreecraftCore
 					IPeerMessageHandler<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>[] handlers
 						= context.ResolveNamed<IEnumerable<IPeerMessageHandler<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>>>("Client")
 							.ToArray();
-
-					Console.WriteLine($"Found: {handlers.Length} many client handlers.");
 
 					return new MessageHandlerService<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>(handlers, context.Resolve<GameDefaultClientRequestHandler>());
 				})

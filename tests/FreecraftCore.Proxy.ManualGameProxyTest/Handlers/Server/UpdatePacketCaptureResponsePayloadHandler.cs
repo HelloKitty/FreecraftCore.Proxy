@@ -45,7 +45,7 @@ namespace FreecraftCore
 		}
 
 		/// <inheritdoc />
-		public override Task HandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, SMSG_COMPRESSED_UPDATE_OBJECT_Payload payload)
+		public override Task OnHandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, SMSG_COMPRESSED_UPDATE_OBJECT_Payload payload)
 		{
 			//Remove all blocks except for players
 			return context.ProxyConnection.SendMessage(new SMSG_COMPRESSED_UPDATE_OBJECT_Payload(new UpdateBlockCollection(payload.UpdateBlocks.Items.Where(u => IsPlayerUpdateBlock(u)).ToArray())));

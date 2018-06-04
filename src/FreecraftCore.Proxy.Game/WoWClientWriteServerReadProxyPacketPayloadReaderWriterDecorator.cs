@@ -113,7 +113,7 @@ namespace FreecraftCore
 
 			OutgoingClientPacketHeader header = new OutgoingClientPacketHeader(payloadData.Length - 2, (NetworkOperationCode)payloadData.Reinterpret<short>(0));
 
-			Console.WriteLine($"New ClientHeader: OpCode: {header.OperationCode} PacketSize: {header.PacketSize} PayloadSize: {header.PayloadSize}");
+			//Console.WriteLine($"New ClientHeader: OpCode: {header.OperationCode} PacketSize: {header.PacketSize} PayloadSize: {header.PayloadSize}");
 
 			//We subtract 2 from the payload data length because first 2 bytes are opcode and header contains opcode.
 			//Then we reinterpet the first 2 bytes of the payload data because it's the opcode we need to use.
@@ -136,7 +136,7 @@ namespace FreecraftCore
 					.ConfigureAwait(false);
 			}
 
-			Console.WriteLine($"Send to client: {payload.GetType()}");
+			//Console.WriteLine($"Send to client: {payload.GetType()}");
 		}
 
 		/// <inheritdoc />
@@ -178,14 +178,14 @@ namespace FreecraftCore
 				if(token.IsCancellationRequested)
 					return null;
 
-				Console.WriteLine($"Recieved OpCode: {(NetworkOperationCode)PacketPayloadReadBuffer.Reinterpret<ushort>()}:{PacketPayloadReadBuffer.Reinterpret<short>()}");
+				//Console.WriteLine($"Recieved OpCode: {(NetworkOperationCode)PacketPayloadReadBuffer.Reinterpret<ushort>()}:{PacketPayloadReadBuffer.Reinterpret<short>()}");
 
 				//Deserialize the bytes starting from the begining but ONLY read up to the payload size. We reuse this buffer and it's large
 				//so if we don't specify the length we could end up with an issue.
 				payload = Serializer.Deserialize<TReadPayloadBaseType>(PacketPayloadReadBuffer, 0, header.PayloadSize);
 			}
 
-			Console.WriteLine($"Server Read Client Write: {payload.GetType()}");
+			//Console.WriteLine($"Server Read Client Write: {payload.GetType()}");
 
 			return new NetworkIncomingMessage<TReadPayloadBaseType>(header, payload);
 		}

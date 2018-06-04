@@ -25,7 +25,7 @@ namespace FreecraftCore.Proxy.ManualWotlkToVanillaProxyTest
 			//We need the wotlktovanilla overriden version
 			GameProxyApplicationBase appBase = new WotlkToVanillaProxyAppBase(new NetworkAddressInfo(IPAddress.Parse("127.0.0.1"), 8085),
 				new NetworkAddressInfo(IPAddress.Parse("185.140.120.35"), 58085),
-				new ConsoleLogger(LogLevel.All), gameHandlerModules,
+				new AggergateCommonLoggingLogger(new ConsoleLogger(LogLevel.All), new FileLogger()), gameHandlerModules,
 				new WotlkToVanillaGameTestNetworkSerializers());
 
 			if(!appBase.StartServer())

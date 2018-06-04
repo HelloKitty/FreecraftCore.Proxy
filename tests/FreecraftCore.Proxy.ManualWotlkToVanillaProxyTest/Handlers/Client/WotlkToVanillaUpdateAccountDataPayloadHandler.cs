@@ -21,7 +21,7 @@ namespace FreecraftCore
 		}
 
 		/// <inheritdoc />
-		public override async Task HandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, CMSG_UPDATE_ACCOUNT_DATA_PAYLOAD payload)
+		public override async Task OnHandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, CMSG_UPDATE_ACCOUNT_DATA_PAYLOAD payload)
 		{
 			//So vanilla cmangos and mangos servers do not actually handle this packet
 			//They just discard it. So we will send this packet, though it won't do anything,

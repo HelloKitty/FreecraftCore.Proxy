@@ -54,7 +54,7 @@ namespace FreecraftCore
 		}
 
 		/// <inheritdoc />
-		public override async Task HandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, TUnimplementedPacketPayloadType payload)
+		public override async Task OnHandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, TUnimplementedPacketPayloadType payload)
 		{
 			//When we recieve a packet we want to log the data BUT we always need to make sure we log the opcode appended to it so it can be deserialized
 			Guid newGuid = Guid.NewGuid();

@@ -40,7 +40,7 @@ namespace FreecraftCore
 		}
 
 		/// <inheritdoc />
-		public override async Task HandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, SMSG_UPDATE_OBJECT_Payload_Vanilla payload)
+		public override async Task OnHandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, SMSG_UPDATE_OBJECT_Payload_Vanilla payload)
 		{
 			ObjectUpdateBlock[] blocks = VanillaToWotlkCompressedUpdatePacketHandler.BuildWotlkUpdateBlock(payload.UpdateBlocks);
 
@@ -58,7 +58,7 @@ namespace FreecraftCore
 		}
 
 		/// <inheritdoc />
-		public override async Task HandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, SMSG_COMPRESSED_UPDATE_OBJECT_Payload_Vanilla payload)
+		public override async Task OnHandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, SMSG_COMPRESSED_UPDATE_OBJECT_Payload_Vanilla payload)
 		{
 			ObjectUpdateBlock[] wotlkUpdateBlocks = BuildWotlkUpdateBlock(payload.UpdateBlocks);
 

@@ -21,7 +21,7 @@ namespace FreecraftCore
 		}
 
 		/// <inheritdoc />
-		public override Task HandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, CharacterListResponse payload)
+		public override Task OnHandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, CharacterListResponse payload)
 		{
 			if(Logger.IsInfoEnabled)
 				Logger.Info($"Captured CharListResponse packet. ProxyType: {context.ProxyConnection.GetType()} Going to Forward");

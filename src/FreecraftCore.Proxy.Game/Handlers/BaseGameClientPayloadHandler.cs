@@ -26,7 +26,15 @@ namespace FreecraftCore
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
+		public abstract Task OnHandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, TSpecificPayloadType payload);
+
 		/// <inheritdoc />
-		public abstract Task HandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, TSpecificPayloadType payload);
+		public Task HandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, TSpecificPayloadType payload)
+		{
+			if(Logger.IsInfoEnabled)
+				Logger.Info($"Server Sent: {payload.GetOperationCode()}:{((int)payload.GetOperationCode()):X}");
+
+			return OnHandleMessage(context, payload);
+		}
 	}
 }

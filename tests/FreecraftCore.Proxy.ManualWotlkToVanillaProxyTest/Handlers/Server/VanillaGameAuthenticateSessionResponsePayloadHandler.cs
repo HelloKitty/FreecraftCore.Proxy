@@ -26,7 +26,7 @@ namespace FreecraftCore
 
 #pragma warning disable AsyncFixer01 // Unnecessary async/await usage
 		/// <inheritdoc />
-		public override async Task HandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, AuthenticateSessionResponse payload)
+		public override async Task OnHandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, AuthenticateSessionResponse payload)
 		{
 			if(Logger.IsInfoEnabled)
 				Logger.Info($"Auth Response Result: {payload.AuthenticationResult}");

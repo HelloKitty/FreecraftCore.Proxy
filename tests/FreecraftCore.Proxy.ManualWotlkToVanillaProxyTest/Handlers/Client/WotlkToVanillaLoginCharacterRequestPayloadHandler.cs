@@ -26,7 +26,7 @@ namespace FreecraftCore
 		}
 
 		/// <inheritdoc />
-		public override async Task HandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, CharacterLoginRequest payload)
+		public override async Task OnHandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, CharacterLoginRequest payload)
 		{
 			//TODO: May have to implement SendAccountDataTimes
 			//Wotlk expects a lot of extra packets to be sent that 1.12.1 doesn't send

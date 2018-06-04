@@ -29,7 +29,7 @@ namespace FreecraftCore
 		}
 
 		/// <inheritdoc />
-		public override Task HandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, CharacterListResponse_Vanilla payload)
+		public override Task OnHandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, CharacterListResponse_Vanilla payload)
 		{
 			if(Logger.IsInfoEnabled)
 				Logger.Info($"Captured CharListResponse_Vanilla packet. Transforming to wotlk version");

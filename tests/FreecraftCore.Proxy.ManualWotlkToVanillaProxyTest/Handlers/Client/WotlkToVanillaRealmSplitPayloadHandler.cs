@@ -21,7 +21,7 @@ namespace FreecraftCore
 		}
 
 		/// <inheritdoc />
-		public override Task HandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, RealmSplitRequest payload)
+		public override Task OnHandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, RealmSplitRequest payload)
 		{
 			//So vanilla servers don't do this packet
 			//So we will respond with what Trinitycore sends which also just barley does handling on it
