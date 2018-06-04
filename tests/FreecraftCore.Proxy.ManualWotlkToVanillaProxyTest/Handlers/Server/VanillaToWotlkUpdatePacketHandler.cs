@@ -211,15 +211,15 @@ namespace FreecraftCore
 				[18] PLAYER_FIELD_GLYPH_SLOTS_5: 25/3.503246E-44
 				[18] PLAYER_FIELD_GLYPH_SLOTS_6: 26/3.643376E-44
 				[18] PLAYER_GLYPHS_ENABLED: 63/8.82818E-44*/
-				ValuesDictionary.Add((int)EUnitFields.PLAYER_GLYPHS_ENABLED, 31);
+				/*ValuesDictionary.Add((int)EUnitFields.PLAYER_GLYPHS_ENABLED, 31);
 				ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_GLYPH_SLOTS_1, 21);
 				ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_GLYPH_SLOTS_1 + 1, 22);
 				ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_GLYPH_SLOTS_1 + 2, 23);
 				ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_GLYPH_SLOTS_1 + 3, 24);
 				ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_GLYPH_SLOTS_1 + 4, 25);
 				ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_GLYPH_SLOTS_1 + 5, 26);
+				ValuesDictionary.Add((int)EUnitFields.PLAYER_CHOSEN_TITLE, 0);*/
 				ValuesDictionary.Add((int)EUnitFields.UNIT_FIELD_FLAGS_2, 264192);
-				ValuesDictionary.Add((int)EUnitFields.PLAYER_CHOSEN_TITLE, 0);
 
 				//This should be in the packet already
 				/*
@@ -248,11 +248,11 @@ namespace FreecraftCore
 				if(!ValuesDictionary.ContainsKey((int)EUnitFields.PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + 6)) ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + 6, percentageDamageMode);
 				*/
 
-				if(!ValuesDictionary.ContainsKey((int)EUnitFields.UNIT_FIELD_FLAGS_2)) ValuesDictionary.Add((int)EUnitFields.UNIT_FIELD_FLAGS_2, 0x40800);
-				if(!ValuesDictionary.ContainsKey((int)EUnitFields.PLAYER_EXPERTISE)) ValuesDictionary.Add((int)EUnitFields.PLAYER_EXPERTISE, 0);
-				if(!ValuesDictionary.ContainsKey((int)EUnitFields.PLAYER_FLAGS)) ValuesDictionary.Add((int)EUnitFields.PLAYER_FLAGS, 8); //seen in a sniff
+				//if(!ValuesDictionary.ContainsKey((int)EUnitFields.UNIT_FIELD_FLAGS_2)) ValuesDictionary.Add((int)EUnitFields.UNIT_FIELD_FLAGS_2, 0x40800);
+				//if(!ValuesDictionary.ContainsKey((int)EUnitFields.PLAYER_EXPERTISE)) ValuesDictionary.Add((int)EUnitFields.PLAYER_EXPERTISE, 0);
+				//if(!ValuesDictionary.ContainsKey((int)EUnitFields.PLAYER_FLAGS)) ValuesDictionary.Add((int)EUnitFields.PLAYER_FLAGS, 8); //seen in a sniff
 				if(!ValuesDictionary.ContainsKey((int)EUnitFields.UNIT_FIELD_HOVERHEIGHT)) ValuesDictionary.Add((int)EUnitFields.UNIT_FIELD_HOVERHEIGHT, 1.0f.Reinterpret().Reinterpret<int>()); //TODO: change to constant
-				if(!ValuesDictionary.ContainsKey((int)EUnitFields.UNIT_FIELD_MAXPOWER7)) ValuesDictionary.Add((int)EUnitFields.UNIT_FIELD_MAXPOWER7, 0);
+				//if(!ValuesDictionary.ContainsKey((int)EUnitFields.UNIT_FIELD_MAXPOWER7)) ValuesDictionary.Add((int)EUnitFields.UNIT_FIELD_MAXPOWER7, 0);
 				if(!ValuesDictionary.ContainsKey((int)EUnitFields.UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER)) ValuesDictionary.Add((int)EUnitFields.UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER, 1082423867);
 				if(!ValuesDictionary.ContainsKey((int)EUnitFields.PLAYER_FIELD_MAX_LEVEL)) ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_MAX_LEVEL, 60);
 

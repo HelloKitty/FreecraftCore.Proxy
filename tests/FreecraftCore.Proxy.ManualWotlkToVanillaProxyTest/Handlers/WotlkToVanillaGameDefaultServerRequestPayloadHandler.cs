@@ -24,13 +24,11 @@ namespace FreecraftCore
 				NetworkOperationCode.SMSG_POWER_UPDATE,
 				NetworkOperationCode.SMSG_SET_PROFICIENCY,
 				NetworkOperationCode.SMSG_SPELL_GO,
-				NetworkOperationCode.SMSG_ACCOUNT_DATA_TIMES,
 				NetworkOperationCode.SMSG_FEATURE_SYSTEM_STATUS,
 
 				NetworkOperationCode.SMSG_GUILD_EVENT,
 				NetworkOperationCode.SMSG_GUILD_BANK_LIST,
 				NetworkOperationCode.SMSG_GUILD_ROSTER,
-				NetworkOperationCode.SMSG_LEARNED_DANCE_MOVES,
 
 				//We are currently returning an empty list of friends
 				//Until we implement this for 3.3.5 and vanilla
@@ -45,15 +43,11 @@ namespace FreecraftCore
 				NetworkOperationCode.SMSG_INITIALIZE_FACTIONS,
 				NetworkOperationCode.SMSG_SEND_UNLEARN_SPELLS,
 				NetworkOperationCode.SMSG_EQUIPMENT_SET_LIST,
-				NetworkOperationCode.SMSG_LOGIN_SETTIMESPEED,
 				NetworkOperationCode.SMSG_SET_FORCED_REACTIONS,
 
 				//This packet actually must be implemented properly for the 3.3.5 client
 				//it is the most critical packet and it will not go past the loading
 				//bar without it.
-				NetworkOperationCode.SMSG_COMPRESSED_UPDATE_OBJECT,
-				NetworkOperationCode.SMSG_UPDATE_WORLD_STATE,
-				NetworkOperationCode.SMSG_TIME_SYNC_REQ,
 				NetworkOperationCode.SMSG_AURA_UPDATE_ALL,
 				NetworkOperationCode.SMSG_COMPRESSED_MOVES,
 
@@ -95,12 +89,6 @@ namespace FreecraftCore
 				Logger.Warn($"Recieved unproxied Payload: {payload.GetOperationCode()}:{payload.GetType().Name}");
 
 			if(payload is UnknownGamePayload)
-				return;
-
-			//TODO: Remove this test stuff
-			if(payload.GetOperationCode() != NetworkOperationCode.SMSG_AUTH_RESPONSE &&
-				payload.GetOperationCode() != NetworkOperationCode.SMSG_LOGIN_VERIFY_WORLD &&
-				payload.GetOperationCode() != NetworkOperationCode.SMSG_BINDPOINTUPDATE)
 				return;
 
 			//Since we're connected to a vanilla realm we, at least for now, want to discard unknown opcode payloads
