@@ -43,7 +43,6 @@ namespace FreecraftCore
 			//above CMSG_ACCEPT_LEVEL_GRANT
 			if((short)payload.GetOperationCode() > 0x41F || OpCodeBlackList.Contains(payload.GetOperationCode()))
 			{
-				Logger.Warn($"Recieved OpCode: {payload.GetOperationCode()} from client. Discared for now because vanilla WoW does not support that operation code.");
 				return;
 			}
 

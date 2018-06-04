@@ -29,12 +29,20 @@ namespace FreecraftCore
 		public abstract Task OnHandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, TSpecificPayloadType payload);
 
 		/// <inheritdoc />
-		public Task HandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, TSpecificPayloadType payload)
+		public async Task HandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, TSpecificPayloadType payload)
 		{
 			if(Logger.IsInfoEnabled)
 				Logger.Info($"Server Sent: {payload.GetOperationCode()}:{((int)payload.GetOperationCode()):X}");
 
-			return OnHandleMessage(context, payload);
+			try
+			{
+				await OnHandleMessage(context, payload);
+			}
+			catch(Exception e)
+			{
+				if(Logger.IsErrorEnabled)
+					Logger.Error($"Encountered Error in Handler: {GetType().Name} Exception: {e.Message} \n\n Stack: {e.StackTrace}");
+			}
 		}
 	}
 }
