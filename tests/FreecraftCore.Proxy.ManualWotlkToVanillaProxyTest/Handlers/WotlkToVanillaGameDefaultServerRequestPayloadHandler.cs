@@ -99,7 +99,8 @@ namespace FreecraftCore
 
 			//TODO: Remove this test stuff
 			if(payload.GetOperationCode() != NetworkOperationCode.SMSG_AUTH_RESPONSE &&
-				payload.GetOperationCode() != NetworkOperationCode.SMSG_LOGIN_VERIFY_WORLD)
+				payload.GetOperationCode() != NetworkOperationCode.SMSG_LOGIN_VERIFY_WORLD &&
+				payload.GetOperationCode() != NetworkOperationCode.SMSG_BINDPOINTUPDATE)
 				return;
 
 			//Since we're connected to a vanilla realm we, at least for now, want to discard unknown opcode payloads
