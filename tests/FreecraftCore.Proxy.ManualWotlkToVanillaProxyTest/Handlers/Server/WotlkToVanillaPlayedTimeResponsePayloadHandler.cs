@@ -25,9 +25,8 @@ namespace FreecraftCore
 
 		/// <inheritdoc />
 		protected override SMSG_PLAYED_TIME_Payload ConvertToOutputPayload(SMSG_PLAYED_TIME_Payload_Vanilla payload)
-		{
-			//TODO: Will this be ok? We don't really have daily times in 1.12.1 so unsure what to send.
-			return new SMSG_PLAYED_TIME_Payload(payload.TotalPlayTime, payload.TotalPlayTime * 2);
+		{			
+			return new SMSG_PLAYED_TIME_Payload(payload.TotalPlayTime, payload.PlaytimeAtLevel);
 		}
 	}
 }
