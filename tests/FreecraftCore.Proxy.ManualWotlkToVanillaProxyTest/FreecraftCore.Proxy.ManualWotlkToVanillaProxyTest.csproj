@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Handlers\Client\WotlkToVanillaUIWorldTimerRequestPayloadHandler.cs" />
     <Compile Include="Handlers\Client\WotlkToVanillaLoginCharacterRequestPayloadHandler.cs" />
     <Compile Include="Handlers\Client\WotlkToVanillaUpdateAccountDataPayloadHandler.cs" />
     <Compile Include="Handlers\Client\WotlkToVanillaRealmSplitPayloadHandler.cs" />

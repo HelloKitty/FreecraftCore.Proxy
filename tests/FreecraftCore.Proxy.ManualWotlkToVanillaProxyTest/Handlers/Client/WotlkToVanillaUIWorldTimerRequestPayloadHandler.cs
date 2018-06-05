@@ -10,7 +10,6 @@ using JetBrains.Annotations;
 
 namespace FreecraftCore
 {
-	
 	/// <summary>
 	/// Wotlk client sends this to update the UI time.
 	/// So we need to spoof the current unix time.
