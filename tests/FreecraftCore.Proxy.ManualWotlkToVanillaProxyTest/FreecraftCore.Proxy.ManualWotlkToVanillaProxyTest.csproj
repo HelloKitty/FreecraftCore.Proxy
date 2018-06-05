@@ -48,7 +48,9 @@
     <Compile Include="Handlers\Client\WotlkToVanillaRealmSplitPayloadHandler.cs" />
     <Compile Include="Handlers\Client\WotlkToVanillaSessionAuthProofRequestPayloadHandler.cs" />
     <Compile Include="Handlers\Server\VanillaToWotlkUpdatePacketHandler.cs" />
-    <Compile Include="Handlers\Server\WotlkToVanillaGameAuthChallengeEventPayloadHandler - Copy.cs" />
+    <Compile Include="Handlers\Server\WotlkToVanillaQueryTimeResponsePayloadHandler.cs" />
+    <Compile Include="Handlers\Server\WotlkToVanillaNameQueryResponsePayloadHandler.cs" />
+    <Compile Include="Handlers\Server\WotlkToVanillaPlayedTimeResponsePayloadHandler.cs" />
     <Compile Include="Handlers\Server\WotlkToVanillaGameInitializeTimeRatePayloadHandler.cs" />
     <Compile Include="Handlers\Server\VanillaGameAuthenticateSessionResponsePayloadHandler.cs" />
     <Compile Include="Handlers\Server\GameCharacterListResponsePayloadHandler.cs" />
