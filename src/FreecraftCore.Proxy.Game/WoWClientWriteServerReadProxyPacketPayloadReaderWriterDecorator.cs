@@ -155,7 +155,8 @@ namespace FreecraftCore
 				//Check crypto first. We may need to decrypt this header
 				//This is very complicated though for reading server headers
 				//since they do not have a constant size
-				header = await BuildHeaderWithDecryption(token);
+				header = await BuildHeaderWithDecryption(token)
+					.ConfigureAwait(false);
 
 				//If the header is null it means the socket disconnected
 				if(header == null)
@@ -178,14 +179,14 @@ namespace FreecraftCore
 				if(token.IsCancellationRequested)
 					return null;
 
-				//Console.WriteLine($"Recieved OpCode: {(NetworkOperationCode)PacketPayloadReadBuffer.Reinterpret<ushort>()}:{PacketPayloadReadBuffer.Reinterpret<short>()}");
+				Console.WriteLine($"Server Debug OpCode: {(NetworkOperationCode)PacketPayloadReadBuffer.Reinterpret<ushort>()}:{PacketPayloadReadBuffer.Reinterpret<short>()}");
 
 				//Deserialize the bytes starting from the begining but ONLY read up to the payload size. We reuse this buffer and it's large
 				//so if we don't specify the length we could end up with an issue.
 				payload = Serializer.Deserialize<TReadPayloadBaseType>(PacketPayloadReadBuffer, 0, header.PayloadSize);
 			}
 
-			//Console.WriteLine($"Server Read Client Write: {payload.GetType()}");
+			Console.WriteLine($"Server Read Client Write Debug: {payload.GetType()}");
 
 			return new NetworkIncomingMessage<TReadPayloadBaseType>(header, payload);
 		}

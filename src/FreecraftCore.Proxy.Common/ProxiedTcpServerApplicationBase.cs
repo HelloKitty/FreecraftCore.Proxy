@@ -21,11 +21,6 @@ namespace FreecraftCore
 		/// </summary>
 		public NetworkAddressInfo ProxyToEndpointAddress { get; }
 
-		/// <summary>
-		/// Application logger.
-		/// </summary>
-		public ILog Logger { get; }
-
 		private PayloadHandlerRegisterationModules<TPayloadReadType, TPayloadWriteType> HandlerModulePair { get; }
 
 		private NetworkSerializerServicePair Serializers { get; }
@@ -41,9 +36,8 @@ namespace FreecraftCore
 
 		/// <inheritdoc />
 		private ProxiedTcpServerApplicationBase([NotNull] NetworkAddressInfo serverAddress, [NotNull] NetworkAddressInfo proxyToEndpointAddress, [NotNull] ILog logger, [NotNull] INetworkMessageDispatchingStrategy<TPayloadWriteType, TPayloadReadType> messageHandlingStrategy, [NotNull] PayloadHandlerRegisterationModules<TPayloadReadType, TPayloadWriteType> handlerModulePair, [NotNull] NetworkSerializerServicePair serializers) 
-			: base(serverAddress, messageHandlingStrategy)
+			: base(serverAddress, messageHandlingStrategy, logger)
 		{
-			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			HandlerModulePair = handlerModulePair ?? throw new ArgumentNullException(nameof(handlerModulePair));
 			Serializers = serializers ?? throw new ArgumentNullException(nameof(serializers));
 			ProxyToEndpointAddress = proxyToEndpointAddress ?? throw new ArgumentNullException(nameof(proxyToEndpointAddress));

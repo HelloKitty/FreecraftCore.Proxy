@@ -21,7 +21,8 @@ namespace FreecraftCore
 
 		public async Task DispatchNetworkMessage(SessionMessageContext<TPayloadWriteType, TPayloadReadType> context)
 		{
-			using(await InPlaceAsyncLockedNetworkMessageDispatchingStrategy.LockObject.LockAsync().ConfigureAwait(false))
+			//TODO: Renable lock
+			//using(await InPlaceAsyncLockedNetworkMessageDispatchingStrategy.LockObject.LockAsync().ConfigureAwait(false))
 				await DecoratedDisaDispatchingStrategy.DispatchNetworkMessage(context)
 					.ConfigureAwait(false);
 		}

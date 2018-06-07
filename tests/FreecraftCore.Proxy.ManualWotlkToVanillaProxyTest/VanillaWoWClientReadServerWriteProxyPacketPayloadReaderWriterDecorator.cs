@@ -34,7 +34,7 @@ namespace FreecraftCore
 
 			ushort size = PacketPayloadReadBuffer.Reinterpret<ushort>(1);
 
-			//Console.WriteLine($"Recieved server packet header size: {size}");
+			Console.WriteLine($"Recieved server packet header size: {size}");
 
 			return new ServerPacketHeader(size);
 		}

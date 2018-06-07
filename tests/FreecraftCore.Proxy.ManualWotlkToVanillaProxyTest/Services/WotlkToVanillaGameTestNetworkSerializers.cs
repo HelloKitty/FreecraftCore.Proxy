@@ -47,7 +47,7 @@ namespace FreecraftCore
 				.Concat(GamePacketMetadataMarker.GamePacketPayloadTypes.Where(t => opcodeSet.Contains(t.Attribute<GamePayloadOperationCodeAttribute>().OperationCode)))
 				.Concat(VanillaGamePacketMetadataMarker.VanillaGamePacketPayloadTypes)
 				//TODO: Disable this when you need
-				//.Where(t => t != typeof(SMSG_COMPRESSED_UPDATE_OBJECT_Payload_Vanilla) && t != typeof(SMSG_UPDATE_OBJECT_Payload_Vanilla))
+				.Where(t => t != typeof(SMSG_CONTACT_LIST_PAYLOAD))
 				.ToList()
 				.ForEach(t =>
 				{
@@ -64,6 +64,7 @@ namespace FreecraftCore
 			//TODO: Uncomment for dumping
 			//serializer.RegisterType(typeof(SMSG_COMPRESSED_UPDATE_OBJECT_DTO_PROXY));
 			//serializer.RegisterType(typeof(SMSG_UPDATE_OBJECT_DTO_PROXY));
+			serializer.RegisterType<SMSG_CONTACT_LIST_DTO_PROXY>();
 
 			serializer.Compile();
 
@@ -77,6 +78,7 @@ namespace FreecraftCore
 			GamePacketMetadataMarker
 				.SerializableTypes
 				.Concat(GamePacketMetadataMarker.GamePacketPayloadTypes)
+				.Where(t => t != typeof(SMSG_CONTACT_LIST_PAYLOAD))
 				.ToList()
 				.ForEach(t => serializer.RegisterType(t));
 
@@ -87,6 +89,7 @@ namespace FreecraftCore
 			//Also the header types
 			serializer.RegisterType<ServerPacketHeader>();
 			serializer.RegisterType<OutgoingClientPacketHeader>();
+			serializer.RegisterType<SMSG_CONTACT_LIST_DTO_PROXY>();
 
 			serializer.Compile();
 

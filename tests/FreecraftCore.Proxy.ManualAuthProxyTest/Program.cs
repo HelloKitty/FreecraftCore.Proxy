@@ -19,7 +19,7 @@ namespace FreecraftCore.Auth
 			authHandlerModules.AddClientHanderModule(new ManualAuthProxyTestClientMessageHandlerRegisterationModule());
 
 			AuthenticationProxyApplicationBase appBase = new AuthenticationProxyApplicationBase(new NetworkAddressInfo(IPAddress.Parse("127.0.0.1"), 3724),
-				new NetworkAddressInfo(Dns.GetHostAddresses("logon.wowfeenix.com").First(), 3724), new FreecraftCore.ConsoleLogger(LogLevel.All), authHandlerModules,
+				new NetworkAddressInfo(Dns.GetHostAddresses("ec2-18-218-255-202.us-east-2.compute.amazonaws.com").First(), 3724), new FreecraftCore.ConsoleLogger(LogLevel.All), authHandlerModules,
 				//new NetworkAddressInfo(IPAddress.Parse("127.0.0.1"), 5050), new FreecraftCore.ConsoleLogger(LogLevel.All), authHandlerModules,
 				new AuthTestNetworkSerializers());
 

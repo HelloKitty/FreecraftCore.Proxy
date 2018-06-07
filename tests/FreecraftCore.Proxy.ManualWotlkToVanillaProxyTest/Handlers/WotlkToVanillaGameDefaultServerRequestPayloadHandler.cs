@@ -49,10 +49,8 @@ namespace FreecraftCore
 				//it is the most critical packet and it will not go past the loading
 				//bar without it.
 				NetworkOperationCode.SMSG_AURA_UPDATE_ALL,
-				NetworkOperationCode.SMSG_COMPRESSED_MOVES,
 
 				NetworkOperationCode.SMSG_EXPECTED_SPAM_RECORDS,
-				NetworkOperationCode.SMSG_MESSAGECHAT,
 
 				//This OpCode is sent by initial before map join
 				//but on Cmangos it is called SMSG_SET_REST_START
@@ -70,6 +68,15 @@ namespace FreecraftCore
 
 				//TODO: Research what this is.
 				NetworkOperationCode.SMSG_QUEST_FORCE_REMOVE,
+
+				//TODO: Implement so we can get quest responses
+				NetworkOperationCode.SMSG_QUESTGIVER_STATUS,
+
+				//TODO: Implement to handle creatures moving around
+				NetworkOperationCode.SMSG_MONSTER_MOVE,
+
+				//TODO: Renable when chat transformation is complete
+				NetworkOperationCode.SMSG_MESSAGECHAT
 			};
 
 		/// <inheritdoc />
@@ -94,7 +101,8 @@ namespace FreecraftCore
 			//Since we're connected to a vanilla realm we, at least for now, want to discard unknown opcode payloads
 			if((short)payload.GetOperationCode() > 0x41F || OpCodeBlackList.Contains(payload.GetOperationCode()))
 			{
-			//	Logger.Warn($"Recieved OpCode: {payload.GetOperationCode()} from server. Discared for now because unimplemented or wotlk doesn't support.");
+				if(Logger.IsWarnEnabled)
+					Logger.Warn($"Discarded by OpCode: {payload.GetOperationCode()} from server.");
 				return;
 			}
 

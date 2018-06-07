@@ -6,12 +6,12 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.8.1" />
-    <PackageReference Include="FreecraftCore.Serializer" Version="3.0.33" />
-    <PackageReference Include="GladNet3.Client.DotNetTcpClient" Version="3.0.34" />
-    <PackageReference Include="GladNet3.Handler.API" Version="3.0.34" />
-    <PackageReference Include="GladNet3.Serializer.FreecraftCore" Version="3.0.34" />
-    <PackageReference Include="GladNet3.Server.API" Version="3.0.34" />
-    <PackageReference Include="GladNet3.Server.DotNetTcpServer" Version="3.0.34" />
+    <PackageReference Include="FreecraftCore.Serializer" Version="3.0.34" />
+    <PackageReference Include="GladNet3.Client.DotNetTcpClient" Version="3.0.37" />
+    <PackageReference Include="GladNet3.Handler.API" Version="3.0.37" />
+    <PackageReference Include="GladNet3.Serializer.FreecraftCore" Version="3.0.37" />
+    <PackageReference Include="GladNet3.Server.API" Version="3.0.37" />
+    <PackageReference Include="GladNet3.Server.DotNetTcpServer" Version="3.0.37" />
     <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
   </ItemGroup>
 

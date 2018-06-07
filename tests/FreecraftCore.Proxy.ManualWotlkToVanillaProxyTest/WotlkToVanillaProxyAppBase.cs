@@ -15,7 +15,12 @@ namespace FreecraftCore
 		/// <inheritdoc />
 		public WotlkToVanillaProxyAppBase(NetworkAddressInfo listenerAddress, NetworkAddressInfo proxyToEndpointAddress, [NotNull] ILog logger, PayloadHandlerRegisterationModules<GamePacketPayload, GamePacketPayload> handlerModulePair, NetworkSerializerServicePair serializers) : base(listenerAddress, proxyToEndpointAddress, logger, handlerModulePair, serializers)
 		{
-
+			//TODO: Support .NET Core global exception handling
+			AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+			{
+				Exception e = args.ExceptionObject as Exception;
+				Logger.Fatal($"Unhandled Exception: {e.GetType().Name} Message: {e.Message} \n\n Stack: {e.StackTrace}");
+			};
 		}
 
 		//TODO: Redo this design so we can inject this somehow.

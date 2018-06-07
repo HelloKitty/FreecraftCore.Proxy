@@ -43,13 +43,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Handlers\Client\WotlkToVanillaPlayedTimeClientPayloadHandler.cs" />
     <Compile Include="Handlers\Client\WotlkToVanillaUIWorldTimerRequestPayloadHandler.cs" />
     <Compile Include="Handlers\Client\WotlkToVanillaLoginCharacterRequestPayloadHandler.cs" />
     <Compile Include="Handlers\Client\WotlkToVanillaUpdateAccountDataPayloadHandler.cs" />
     <Compile Include="Handlers\Client\WotlkToVanillaRealmSplitPayloadHandler.cs" />
     <Compile Include="Handlers\Client\WotlkToVanillaSessionAuthProofRequestPayloadHandler.cs" />
-    <Compile Include="Handlers\Server\WotlkToVanillaAddonCheckPayloadHandler.cs" />
+    <Compile Include="Handlers\Server\Discards\WotlkToVanillaWardenDataDiscardHandler.cs" />
+    <Compile Include="Handlers\Server\Discards\WotlkToVanillaAddonCheckPayloadHandler.cs" />
     <Compile Include="Handlers\Server\VanillaToWotlkUpdatePacketHandler.cs" />
+    <Compile Include="Handlers\Server\WotlkToVanillaInitialSpellsPayloadHandler.cs" />
+    <Compile Include="Handlers\Server\WotlkToVanillaKeybindPayloadHandler.cs" />
     <Compile Include="Handlers\Server\WotlkToVanillaQueryTimeResponsePayloadHandler.cs" />
     <Compile Include="Handlers\Server\WotlkToVanillaNameQueryResponsePayloadHandler.cs" />
     <Compile Include="Handlers\Server\WotlkToVanillaPlayedTimeResponsePayloadHandler.cs" />
@@ -91,25 +95,25 @@
       <Version>2.1.3</Version>
     </PackageReference>
     <PackageReference Include="FreecraftCore.API.Common">
-      <Version>1.0.64</Version>
+      <Version>1.0.68</Version>
     </PackageReference>
     <PackageReference Include="FreecraftCore.Packet.Game">
-      <Version>1.0.64</Version>
+      <Version>1.0.68</Version>
     </PackageReference>
     <PackageReference Include="FreecraftCore.Packet.Game.1_12_1">
-      <Version>1.0.64</Version>
+      <Version>1.0.68</Version>
     </PackageReference>
     <PackageReference Include="FreecraftCore.Packet.Game.Stubs">
-      <Version>1.0.64</Version>
+      <Version>1.0.68</Version>
     </PackageReference>
     <PackageReference Include="FreecraftCore.Serializer">
-      <Version>3.0.33</Version>
+      <Version>3.0.34</Version>
     </PackageReference>
     <PackageReference Include="GladNet3.Crypto.API">
-      <Version>3.0.34</Version>
+      <Version>3.0.37</Version>
     </PackageReference>
     <PackageReference Include="GladNet3.Handler.API">
-      <Version>3.0.34</Version>
+      <Version>3.0.37</Version>
     </PackageReference>
     <PackageReference Include="MemorySharp">
       <Version>1.2.0</Version>

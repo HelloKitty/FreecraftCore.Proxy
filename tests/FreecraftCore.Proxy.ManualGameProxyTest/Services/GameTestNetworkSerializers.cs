@@ -33,7 +33,7 @@ namespace FreecraftCore
 			//TODO: Renable object update
 			GamePacketMetadataMarker
 				.SerializableTypes
-				//.Where(p => !p.GetType().Name.ToUpper().Contains("UPDATE_OBJECT"))
+				.Where(p => !p.Name.ToUpper().Contains("ADDON"))
 				.ToList()
 				.ForEach(t => serializer.RegisterType(t));
 
@@ -49,6 +49,7 @@ namespace FreecraftCore
 			//Manually register PROXY_DTO
 			//serializer.RegisterType(typeof(SMSG_COMPRESSED_UPDATE_OBJECT_DTO_PROXY));
 			//serializer.RegisterType(typeof(SMSG_UPDATE_OBJECT_DTO_PROXY));
+			serializer.RegisterType<SMSG_ADDON_INFO_DTO_PROXY>();
 
 			//Also the header types
 			serializer.RegisterType<ServerPacketHeader>();

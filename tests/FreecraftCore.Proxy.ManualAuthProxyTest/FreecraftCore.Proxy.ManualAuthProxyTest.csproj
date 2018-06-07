@@ -33,4 +33,8 @@
     <ProjectReference Include="..\..\src\FreecraftCore.Proxy.Handler.Common\FreecraftCore.Proxy.Handler.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Handlers\Server\" />
+  </ItemGroup>
+
 </Project>

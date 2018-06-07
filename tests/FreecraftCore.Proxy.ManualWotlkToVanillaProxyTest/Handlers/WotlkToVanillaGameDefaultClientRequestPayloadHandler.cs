@@ -19,7 +19,23 @@ namespace FreecraftCore
 			= new HashSet<NetworkOperationCode>()
 			{
 				NetworkOperationCode.CMSG_READY_FOR_ACCOUNT_DATA_TIMES,
-				NetworkOperationCode.CMSG_WARDEN_DATA
+				NetworkOperationCode.CMSG_WARDEN_DATA,
+
+				//TODO: We should implement some of these
+				NetworkOperationCode.CMSG_SET_ACTIONBAR_TOGGLES,
+				NetworkOperationCode.CMSG_REQUEST_RAID_INFO,
+				NetworkOperationCode.CMSG_GMTICKET_GETTICKET,
+				NetworkOperationCode.MSG_QUERY_NEXT_MAIL_TIME,
+				NetworkOperationCode.CMSG_BATTLEFIELD_STATUS,
+				NetworkOperationCode.CMSG_LFG_GET_STATUS,
+				NetworkOperationCode.CMSG_LFD_PLAYER_LOCK_INFO_REQUEST,
+				NetworkOperationCode.MSG_GUILD_BANK_MONEY_WITHDRAWN,
+				NetworkOperationCode.CMSG_CALENDAR_GET_NUM_PENDING,
+				NetworkOperationCode.CMSG_VOICE_SESSION_ENABLE,
+				
+				//Required to recieve updates about the world
+				//NetworkOperationCode.CMSG_ZONEUPDATE,
+				NetworkOperationCode.CMSG_SET_ACTIVE_VOICE_CHANNEL
 			};
 
 		/// <inheritdoc />
@@ -43,6 +59,8 @@ namespace FreecraftCore
 			//above CMSG_ACCEPT_LEVEL_GRANT
 			if((short)payload.GetOperationCode() > 0x41F || OpCodeBlackList.Contains(payload.GetOperationCode()))
 			{
+				if(Logger.IsWarnEnabled)
+					Logger.Warn($"Discarding based on OpCode: {payload.GetOperationCode()} from client.");
 				return;
 			}
 

@@ -15,13 +15,11 @@ namespace FreecraftCore
 	[ServerPayloadHandler]
 	public sealed class VanillaGameAuthenticateSessionResponsePayloadHandler : BaseGameServerPayloadHandler<AuthenticateSessionResponse>
 	{
-		private ICryptoKeyInitializable<byte[]> CryptoInitializer { get; }
-
 		/// <inheritdoc />
-		public VanillaGameAuthenticateSessionResponsePayloadHandler([NotNull] ILog logger, [NotNull] ICryptoKeyInitializable<byte[]> cryptoInit) 
+		public VanillaGameAuthenticateSessionResponsePayloadHandler([NotNull] ILog logger) 
 			: base(logger)
 		{
-			CryptoInitializer = cryptoInit ?? throw new ArgumentNullException(nameof(cryptoInit));
+
 		}
 
 #pragma warning disable AsyncFixer01 // Unnecessary async/await usage
@@ -32,6 +30,17 @@ namespace FreecraftCore
 				Logger.Info($"Auth Response Result: {payload.AuthenticationResult}");
 
 			await context.ProxyConnection.SendMessageImmediately(payload, DeliveryMethod.ReliableOrdered)
+				.ConfigureAwait(false);
+
+
+			if(Logger.IsInfoEnabled)
+				Logger.Info($"Spoofing addon check information.");
+
+			//After the result is sent for game auth then the client will
+			//expect that we send addon information otherwise addons won't work
+			//We must send the 
+			//Make sure to send the client, not sever by accident
+			await context.ProxyConnection.SendMessage(new SMSG_ADDON_INFO_Payload(Enumerable.Repeat(new AddonChecksumResult(0, false), 23).ToArray()))
 				.ConfigureAwait(false);
 		}
 #pragma warning restore AsyncFixer01 // Unnecessary async/await usage

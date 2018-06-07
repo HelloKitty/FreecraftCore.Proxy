@@ -27,6 +27,9 @@ namespace FreecraftCore
 		/// <inheritdoc />
 		public override Task OnHandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, CMSG_WORLD_STATE_UI_TIMER_UPDATE_DTO_PROXY payload)
 		{
+			if(Logger.IsDebugEnabled)
+				Logger.Debug($"Spoofing response to: {payload.GetOperationCode()}");
+
 			//TODO: Is this time correct?
 			//Vanilla 1.12.1 does not implement this packet. So we should sent current unix time stamp
 			//in the spoofed response.

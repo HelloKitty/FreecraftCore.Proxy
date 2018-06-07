@@ -32,7 +32,7 @@ namespace FreecraftCore
 		public async Task HandleMessage(IProxiedMessageContext<GamePacketPayload, GamePacketPayload> context, TSpecificPayloadType payload)
 		{
 			if(Logger.IsInfoEnabled)
-				Logger.Info($"Server Sent: {payload.GetOperationCode()}:{((int)payload.GetOperationCode()):X}");
+				Logger.Info($"Client Sent: {payload.GetOperationCode()}:{((int)payload.GetOperationCode()):X}");
 
 			try
 			{

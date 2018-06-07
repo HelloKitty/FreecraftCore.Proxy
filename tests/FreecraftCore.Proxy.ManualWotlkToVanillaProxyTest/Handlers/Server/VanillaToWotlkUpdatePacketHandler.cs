@@ -65,13 +65,12 @@ namespace FreecraftCore
 			//Once the blocks are rebuilt we can send the packet off on its way
 			await context.ProxyConnection.SendMessage(new SMSG_COMPRESSED_UPDATE_OBJECT_Payload(new UpdateBlockCollection(wotlkUpdateBlocks)));
 
-			/*
-			BitArray postUpdateBitArray = new BitArray((int)EUnitFields.PLAYER_END * 32, false);
+			/*BitArray postUpdateBitArray = new BitArray((int)(int)1344, false);
 			/*[0] UpdateType: Values
 			[0] GUID: Full: 0x0000000B Type: Player Low: 11 Name: Testchamp
 			[0] UNIT_FIELD_AURASTATE: 4194304/5.877472E-39
 			[0] UNIT_DYNAMIC_FLAGS: 0/0
-			[0] UNIT_NPC_FLAGS: 0/0#1#
+			[0] UNIT_NPC_FLAGS: 0/0#2##1#
 			postUpdateBitArray.Set((int)EUnitFields.UNIT_FIELD_AURASTATE, true);
 			postUpdateBitArray.Set((int)EUnitFields.UNIT_DYNAMIC_FLAGS, true);
 			postUpdateBitArray.Set((int)EUnitFields.UNIT_NPC_FLAGS, true);
@@ -79,10 +78,9 @@ namespace FreecraftCore
 			int[] values = new int[3] { 4194304, 0, 0 };
 
 			//This I think 3.3.5 sends but 1.12.1 does not
-			ObjectUpdateValuesObjectBlock updateBlock = new ObjectUpdateValuesObjectBlock(new PackedGuid(0x0000000B), new UpdateFieldValueCollection(postUpdateBitArray, values.Reinterpret()));
+			ObjectUpdateValuesObjectBlock updateBlock = new ObjectUpdateValuesObjectBlock(new PackedGuid(0x00000001), new UpdateFieldValueCollection(postUpdateBitArray, values.Reinterpret()));
 
-			await context.ProxyConnection.SendMessage(new SMSG_COMPRESSED_UPDATE_OBJECT_Payload(new UpdateBlockCollection(new ObjectUpdateBlock[] {updateBlock})));
-			*/
+			await context.ProxyConnection.SendMessage(new SMSG_COMPRESSED_UPDATE_OBJECT_Payload(new UpdateBlockCollection(new ObjectUpdateBlock[] {updateBlock})));*/
 		}
 
 		public static ObjectUpdateBlock[] BuildWotlkUpdateBlock(UpdateBlockCollection_Vanilla blocks)
@@ -129,19 +127,19 @@ namespace FreecraftCore
 
 		private static ObjectUpdateCreateObject2Block RebuildCreateObjectBlock2(ObjectUpdateCreateObject2Block_Vanilla objectUpdateCreateObject2BlockVanilla)
 		{
-			if(objectUpdateCreateObject2BlockVanilla.CreationData.CreationObjectType != ObjectType.Player)
+			if(objectUpdateCreateObject2BlockVanilla.CreationData.CreationObjectType != ObjectType.Player && objectUpdateCreateObject2BlockVanilla.CreationData.CreationObjectType != ObjectType.Unit)
 				return null;
 
 			return new ObjectUpdateCreateObject2Block(new ObjectCreationData(objectUpdateCreateObject2BlockVanilla.CreationData.CreationGuid, objectUpdateCreateObject2BlockVanilla.CreationData.CreationObjectType,
 				BuildWotlkMovementDataFromVanilla(objectUpdateCreateObject2BlockVanilla.CreationData.MovementData), ToWotlkUpdateValues(objectUpdateCreateObject2BlockVanilla.CreationData.CreationGuid, objectUpdateCreateObject2BlockVanilla.CreationData.ObjectValuesCollection)));
 		}
 
-		private static ObjectUpdateBlock RebuildCreateObjectBlock1(ObjectUpdateCreateObject1Block_Vanilla objectUpdateCreateObject1BlockVanilla)
+		private static ObjectUpdateCreateObject1Block RebuildCreateObjectBlock1(ObjectUpdateCreateObject1Block_Vanilla objectUpdateCreateObject1BlockVanilla)
 		{
-			if(objectUpdateCreateObject1BlockVanilla.CreationData.CreationObjectType != ObjectType.Player)
+			if(objectUpdateCreateObject1BlockVanilla.CreationData.CreationObjectType != ObjectType.Player && objectUpdateCreateObject1BlockVanilla.CreationData.CreationObjectType != ObjectType.Unit)
 				return null;
 
-			return new ObjectUpdateCreateObject2Block(new ObjectCreationData(objectUpdateCreateObject1BlockVanilla.CreationData.CreationGuid, objectUpdateCreateObject1BlockVanilla.CreationData.CreationObjectType,
+			return new ObjectUpdateCreateObject1Block(new ObjectCreationData(objectUpdateCreateObject1BlockVanilla.CreationData.CreationGuid, objectUpdateCreateObject1BlockVanilla.CreationData.CreationObjectType,
 				BuildWotlkMovementDataFromVanilla(objectUpdateCreateObject1BlockVanilla.CreationData.MovementData), ToWotlkUpdateValues(objectUpdateCreateObject1BlockVanilla.CreationData.CreationGuid, objectUpdateCreateObject1BlockVanilla.CreationData.ObjectValuesCollection)));
 		}
 
@@ -149,244 +147,119 @@ namespace FreecraftCore
 		{
 			if(objectGuid.isType(EntityGuidMask.Player))
 			{
-				//We need to build a new dictionary of update values because the value array could likely change too
-				//TODO: Don't hardcode size value, compute block size manually
-				BitArray bitMaskPlayer = new BitArray((int)1344, false);
-				Dictionary<int, int> ValuesDictionary = new Dictionary<int, int>(updateCollection.UpdateDiffValues.Length / sizeof(int));
-				int valueIndex = 0;
+				return BuildWotlkPlayerUpdateFieldCollection(updateCollection);
+			}
+			else if(objectGuid.isType(EntityGuidMask.Unit))
+				return BuildWotlkUnitUpdateFieldCollection(updateCollection);
 
-				//Wotlk and vanilla both have the same object field
-				for(int i = 0; i < (int)EObjectFields.OBJECT_END; i++)
+
+			return null;
+		}
+
+		private static UpdateFieldValueCollection BuildWotlkUnitUpdateFieldCollection(UpdateFieldValueCollection updateCollection)
+		{
+			//We need to build a new dictionary of update values because the value array could likely change too
+			//TODO: Don't hardcode size value, compute block size manually
+			BitArray bitMaskPlayer = new BitArray((int)192, false); //TODO: What is the unit size? Is UNIT_END correct?
+			Dictionary<int, int> ValuesDictionary = new Dictionary<int, int>(updateCollection.UpdateDiffValues.Length / sizeof(int));
+			int valueIndex = 0;
+
+			InitializeObjectFields(updateCollection, ValuesDictionary, ref valueIndex);
+			InitializeUnitFields(updateCollection, ValuesDictionary, ref valueIndex, EUnitFields_Vanilla.UNIT_END);
+
+			int[] values = SetBitMaskAndBuildValues(bitMaskPlayer, ValuesDictionary);
+
+			return new UpdateFieldValueCollection(bitMaskPlayer, values.Reinterpret());
+		}
+
+		private static UpdateFieldValueCollection BuildWotlkPlayerUpdateFieldCollection(UpdateFieldValueCollection updateCollection)
+		{
+			//We need to build a new dictionary of update values because the value array could likely change too
+			//TODO: Don't hardcode size value, compute block size manually
+			BitArray bitMaskPlayer = new BitArray((int)1344, false);
+			Dictionary<int, int> ValuesDictionary = new Dictionary<int, int>(updateCollection.UpdateDiffValues.Length / sizeof(int));
+			int valueIndex = 0;
+
+			InitializeObjectFields(updateCollection, ValuesDictionary, ref valueIndex);
+
+			InitializeUnitFields(updateCollection, ValuesDictionary, ref valueIndex);
+
+			if(!ValuesDictionary.ContainsKey((int)EUnitFields.UNIT_FIELD_FLAGS_2)) ValuesDictionary.Add((int)EUnitFields.UNIT_FIELD_FLAGS_2, 264192);
+			if(!ValuesDictionary.ContainsKey((int)EUnitFields.UNIT_FIELD_HOVERHEIGHT)) ValuesDictionary.Add((int)EUnitFields.UNIT_FIELD_HOVERHEIGHT, 1.0f.Reinterpret().Reinterpret<int>()); //TODO: change to constant
+			if(!ValuesDictionary.ContainsKey((int)EUnitFields.UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER)) ValuesDictionary.Add((int)EUnitFields.UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER, 1082423867);
+			if(!ValuesDictionary.ContainsKey((int)EUnitFields.PLAYER_FIELD_MAX_LEVEL)) ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_MAX_LEVEL, 60);
+
+			int[] values = SetBitMaskAndBuildValues(bitMaskPlayer, ValuesDictionary);
+
+			return new UpdateFieldValueCollection(bitMaskPlayer, values.Reinterpret());
+		}
+
+		private static void InitializeUnitFields(UpdateFieldValueCollection updateCollection, Dictionary<int, int> valuesDictionary, ref int valueIndex, EUnitFields_Vanilla endField = EUnitFields_Vanilla.PLAYER_END)
+		{
+			//subtract 1 from the length size because it's PlayerEnd
+			for(int i = (int)EObjectFields.OBJECT_END; i < updateCollection.UpdateMask.Length && i < (int)endField; i++)
+			{
+				//TODO: Blacklist these fields
+				//UNIT_FIELD_PERSUADED and UNIT_FIELD_PERSUADED +1
+				//UNIT_CHANNEL_SPELL
+
+				bool shouldWrite = VanillaToWotlkConverter.ConvertUpdateFieldsPlayer((EUnitFields_Vanilla)i, out int shiftAmount);
+
+				//We need to track the index of nonwritten to wotlk, but written to the vanilla update block,
+				//so that we may remove the byte chunk that represents the indicies
+				if(updateCollection.UpdateMask[i])
 				{
-					if(updateCollection.UpdateMask[i])
+					if(shouldWrite)
 					{
-						ValuesDictionary.Add(i, updateCollection.UpdateDiffValues.Reinterpret<int>(valueIndex * sizeof(int)));
-						valueIndex++;
-					}
-				}
-
-				//subtract 1 from the length size because it's PlayerEnd
-				for(int i = (int)EObjectFields.OBJECT_END; i < updateCollection.UpdateMask.Length && i < (int)EUnitFields_Vanilla.PLAYER_END; i++)
-				{
-					//TODO: Blacklist these fields
-					//UNIT_FIELD_PERSUADED and UNIT_FIELD_PERSUADED +1
-					//UNIT_CHANNEL_SPELL
-
-					bool shouldWrite = VanillaToWotlkConverter.ConvertUpdateFieldsPlayer((EUnitFields_Vanilla)i, out int shiftAmount);
-
-					//We need to track the index of nonwritten to wotlk, but written to the vanilla update block,
-					//so that we may remove the byte chunk that represents the indicies
-
-					if(updateCollection.UpdateMask[i])
-					{
-						if(shouldWrite && (i + shiftAmount) == (int)EUnitFields.PLAYER_EXPERTISE)
-							throw new InvalidOperationException($"Had invalid expertise field. i:{i}:{nameof(EUnitFields_Vanilla)}.{((EUnitFields_Vanilla)i).ToString()} shift:{shiftAmount}");
-
-						if(shouldWrite)
+						try
 						{
-							try
-							{
-								//We store in a dictionary with the value so that it may be written
-								//TODO: Store only index so we can do quick memcpy to new values array in the future for perf
-								ValuesDictionary.Add(i + shiftAmount, updateCollection.UpdateDiffValues.Reinterpret<int>(valueIndex * sizeof(int)));
-							}
-							catch(Exception e)
-							{
-								throw new InvalidOperationException($"Failed to insert: i:{i}:{((EUnitFields_Vanilla)i).ToString()} [{i + shiftAmount}] [{((EUnitFields)(i + shiftAmount)).ToString()}] {updateCollection.UpdateDiffValues.Reinterpret<int>(valueIndex * sizeof(int))} into dictionary. \n\n Exception: {e.Message}", e);
-							}
+							//We store in a dictionary with the value so that it may be written
+							//TODO: Store only index so we can do quick memcpy to new values array in the future for perf
+							valuesDictionary.Add(i + shiftAmount, updateCollection.UpdateDiffValues.Reinterpret<int>(valueIndex * sizeof(int)));
 						}
-
-						//no matter what the value index should increase. Because
-						//otherwise it will get descyned from the new values
-						valueIndex++;
+						catch(Exception e)
+						{
+							throw new InvalidOperationException($"Failed to insert: i:{i}:{((EUnitFields_Vanilla)i).ToString()} [{i + shiftAmount}] [{((EUnitFields)(i + shiftAmount)).ToString()}] {updateCollection.UpdateDiffValues.Reinterpret<int>(valueIndex * sizeof(int))} into dictionary. \n\n Exception: {e.Message}", e);
+						}
 					}
+
+					//no matter what the value index should increase. Because
+					//otherwise it will get descyned from the new values
+					valueIndex++;
 				}
+			}
+		}
 
-				//Stuff not sent by the vanilla server
-				/*[18] PLAYER_FIELD_MAX_LEVEL: 80/1.121039E-43
-				[18] PLAYER_FIELD_GLYPH_SLOTS_1: 21/2.942727E-44
-				[18] PLAYER_FIELD_GLYPH_SLOTS_2: 22/3.082857E-44
-				[18] PLAYER_FIELD_GLYPH_SLOTS_3: 23/3.222986E-44
-				[18] PLAYER_FIELD_GLYPH_SLOTS_4: 24/3.363116E-44
-				[18] PLAYER_FIELD_GLYPH_SLOTS_5: 25/3.503246E-44
-				[18] PLAYER_FIELD_GLYPH_SLOTS_6: 26/3.643376E-44
-				[18] PLAYER_GLYPHS_ENABLED: 63/8.82818E-44*/
-				/*ValuesDictionary.Add((int)EUnitFields.PLAYER_GLYPHS_ENABLED, 31);
-				ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_GLYPH_SLOTS_1, 21);
-				ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_GLYPH_SLOTS_1 + 1, 22);
-				ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_GLYPH_SLOTS_1 + 2, 23);
-				ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_GLYPH_SLOTS_1 + 3, 24);
-				ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_GLYPH_SLOTS_1 + 4, 25);
-				ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_GLYPH_SLOTS_1 + 5, 26);
-				ValuesDictionary.Add((int)EUnitFields.PLAYER_CHOSEN_TITLE, 0);*/
-				ValuesDictionary.Add((int)EUnitFields.UNIT_FIELD_FLAGS_2, 264192);
-
-				//This should be in the packet already
-				/*
-				 * [9] PLAYER_FIELD_MOD_DAMAGE_DONE_PCT2: 1065353216/1
-				[9] PLAYER_FIELD_MOD_DAMAGE_DONE_PCT3: 1065353216/1
-				[9] PLAYER_FIELD_MOD_DAMAGE_DONE_PCT4: 1065353216/1
-				[9] PLAYER_FIELD_MOD_DAMAGE_DONE_PCT5: 1065353216/1
-				[9] PLAYER_FIELD_MOD_DAMAGE_DONE_PCT6: 1065353216/1
-				[9] PLAYER_FIELD_MOD_DAMAGE_DONE_PCT7: 1065353216/1
-				 */
-
-				/*int percentageDamageMode = 0;
-				if(!ValuesDictionary.ContainsKey((int)EUnitFields.PLAYER_FIELD_MOD_DAMAGE_DONE_PCT))
+		private static void InitializeObjectFields(UpdateFieldValueCollection updateCollection, Dictionary<int, int> ValuesDictionary, ref int valueIndex)
+		{
+			//Wotlk and vanilla both have the same object field
+			for(int i = 0; i < (int)EObjectFields.OBJECT_END; i++)
+			{
+				if(updateCollection.UpdateMask[i])
 				{
-					ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_MOD_DAMAGE_DONE_PCT, percentageDamageMode = 1.0f.Reinterpret().Reinterpret<int>());
+					ValuesDictionary.Add(i, updateCollection.UpdateDiffValues.Reinterpret<int>(valueIndex * sizeof(int)));
+					valueIndex++;
 				}
-				else
-					percentageDamageMode = ValuesDictionary[(int)EUnitFields.PLAYER_FIELD_MOD_DAMAGE_DONE_PCT];
+			}
+		}
 
-				//Now we also need the other fields
-				if(!ValuesDictionary.ContainsKey((int)EUnitFields.PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + 1)) ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + 1, percentageDamageMode);
-				if(!ValuesDictionary.ContainsKey((int)EUnitFields.PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + 2)) ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + 2, percentageDamageMode);
-				if(!ValuesDictionary.ContainsKey((int)EUnitFields.PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + 3)) ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + 3, percentageDamageMode);
-				if(!ValuesDictionary.ContainsKey((int)EUnitFields.PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + 4)) ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + 4, percentageDamageMode);
-				if(!ValuesDictionary.ContainsKey((int)EUnitFields.PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + 5)) ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + 5, percentageDamageMode);
-				if(!ValuesDictionary.ContainsKey((int)EUnitFields.PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + 6)) ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + 6, percentageDamageMode);
-				*/
+		private static int[] SetBitMaskAndBuildValues(BitArray bitMaskPlayer, Dictionary<int, int> ValuesDictionary)
+		{
+			int valueArrayIndex = 0;
+			int[] values = new int[ValuesDictionary.Count];
+			//We have to build the bitmask now
+			foreach(var kvp in ValuesDictionary.OrderBy(k => k.Key))
+			{
+				bitMaskPlayer.Set(kvp.Key, true);
+				values[valueArrayIndex] = kvp.Value;
+				valueArrayIndex++;
+			}
 
-				//if(!ValuesDictionary.ContainsKey((int)EUnitFields.UNIT_FIELD_FLAGS_2)) ValuesDictionary.Add((int)EUnitFields.UNIT_FIELD_FLAGS_2, 0x40800);
-				//if(!ValuesDictionary.ContainsKey((int)EUnitFields.PLAYER_EXPERTISE)) ValuesDictionary.Add((int)EUnitFields.PLAYER_EXPERTISE, 0);
-				//if(!ValuesDictionary.ContainsKey((int)EUnitFields.PLAYER_FLAGS)) ValuesDictionary.Add((int)EUnitFields.PLAYER_FLAGS, 8); //seen in a sniff
-				if(!ValuesDictionary.ContainsKey((int)EUnitFields.UNIT_FIELD_HOVERHEIGHT)) ValuesDictionary.Add((int)EUnitFields.UNIT_FIELD_HOVERHEIGHT, 1.0f.Reinterpret().Reinterpret<int>()); //TODO: change to constant
-				//if(!ValuesDictionary.ContainsKey((int)EUnitFields.UNIT_FIELD_MAXPOWER7)) ValuesDictionary.Add((int)EUnitFields.UNIT_FIELD_MAXPOWER7, 0);
-				if(!ValuesDictionary.ContainsKey((int)EUnitFields.UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER)) ValuesDictionary.Add((int)EUnitFields.UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER, 1082423867);
-				if(!ValuesDictionary.ContainsKey((int)EUnitFields.PLAYER_FIELD_MAX_LEVEL)) ValuesDictionary.Add((int)EUnitFields.PLAYER_FIELD_MAX_LEVEL, 60);
-
-				int valueArrayIndex = 0;
-				int[] values = new int[ValuesDictionary.Count];
-				//We have to build the bitmask now
-				foreach(var kvp in ValuesDictionary.OrderBy(k => k.Key))
-				{
-					bitMaskPlayer.Set(kvp.Key, true);
-					values[valueArrayIndex] = kvp.Value;
-					valueArrayIndex++;
-				}
-
+			//TODO: Remove this debug stuff
+			if(ValuesDictionary.ContainsKey((int)EObjectFields.OBJECT_FIELD_GUID))
 				File.WriteAllLines($"{ValuesDictionary[(int)EObjectFields.OBJECT_FIELD_GUID]}_GUID_" + Guid.NewGuid(), ValuesDictionary.OrderBy(kvp => kvp.Key).Select(kvp => $"[{kvp.Key}]:[0x{kvp.Key:X}] [{(EUnitFields)kvp.Key}] Value: {kvp.Value}/{kvp.Value.Reinterpret().Reinterpret<float>()}"));
 
-				return new UpdateFieldValueCollection(bitMaskPlayer, values.Reinterpret());
-			}
-			else
-				return null;
-
-				//Manually set these fields for test.
-				/*bitMaskPlayer.Set((int)EObjectFields.OBJECT_FIELD_GUID, true);
-				bitMaskPlayer.Set((int)EObjectFields.OBJECT_FIELD_TYPE, true);
-				bitMaskPlayer.Set((int)EObjectFields.OBJECT_FIELD_SCALE_X, true);
-				bitMaskPlayer.Set((int)EUnitFields.UNIT_FIELD_BYTES_0, true);
-				bitMaskPlayer.Set((int)EUnitFields.UNIT_FIELD_HEALTH, true);
-				bitMaskPlayer.Set((int)EUnitFields.UNIT_FIELD_POWER1, true);
-				bitMaskPlayer.Set((int)EUnitFields.UNIT_FIELD_POWER4, true);
-				bitMaskPlayer.Set((int)EUnitFields.UNIT_FIELD_MAXHEALTH, true);
-				bitMaskPlayer.Set((int)EUnitFields.UNIT_FIELD_MAXPOWER1, true);
-				bitMaskPlayer.Set((int)EUnitFields.UNIT_FIELD_MAXPOWER2, true);
-				bitMaskPlayer.Set((int)EUnitFields.UNIT_FIELD_MAXPOWER4, true);
-				bitMaskPlayer.Set((int)EUnitFields.UNIT_FIELD_MAXPOWER7, true);
-				bitMaskPlayer.Set((int)EUnitFields.UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER, true);
-				bitMaskPlayer.Set((int)EUnitFields.UNIT_FIELD_LEVEL, true);
-				bitMaskPlayer.Set((int)EUnitFields.UNIT_FIELD_FACTIONTEMPLATE, true);
-				bitMaskPlayer.Set((int)EUnitFields.UNIT_FIELD_FLAGS, true);
-				bitMaskPlayer.Set((int)EUnitFields.UNIT_FIELD_FLAGS_2, true);
-				bitMaskPlayer.Set((int)EUnitFields.PLAYER_FLAGS, true);
-				bitMaskPlayer.Set((int)EUnitFields.PLAYER_GLYPHS_ENABLED, true);
-				bitMaskPlayer.Set((int)EUnitFields.PLAYER_FIELD_MAX_LEVEL, true);
-				bitMaskPlayer.Set((int)EUnitFields.PLAYER_FIELD_GLYPH_SLOTS_1 + 1, true);
-				bitMaskPlayer.Set((int)EUnitFields.PLAYER_FIELD_GLYPH_SLOTS_1 + 2, true);
-				bitMaskPlayer.Set((int)EUnitFields.PLAYER_FIELD_GLYPH_SLOTS_1 + 3, true);
-				bitMaskPlayer.Set((int)EUnitFields.PLAYER_FIELD_GLYPH_SLOTS_1 + 4, true);
-				bitMaskPlayer.Set((int)EUnitFields.PLAYER_FIELD_GLYPH_SLOTS_1 + 5, true);
-				int[] updateValues = new int[27];
-				updateValues[0] = (int)(objectGuid.RawGuidValue & 0xFFFFFFFF);
-				updateValues[1] = 25;
-				updateValues[2] = 1065353216;
-				updateValues[3] = 2306;
-				updateValues[4] = 10976;
-				updateValues[5] = 7851;
-				updateValues[6] = 7851;
-				updateValues[7] = 7851;
-				updateValues[8] = 7851;
-				updateValues[9] = 7851;
-				updateValues[10] = 7851;
-				updateValues[11] = 7851;
-				updateValues[12] = 1092137461;
-				updateValues[13] = 60;
-				updateValues[14] = 35;
-				updateValues[15] = 8;
-				updateValues[16] = 264192;
-				updateValues[18] = 8;
-
-
-				//MAX_LVEL
-				updateValues[19] = 60;
-				updateValues[20] = 21;
-				updateValues[21] = 22;
-				updateValues[22] = 23;
-				updateValues[23] = 24;
-				updateValues[24] = 25;
-				updateValues[25] = 26;
-
-				updateValues[26] = 63; //player glyphs enabled
-
-				return new UpdateFieldValueCollection(bitMaskPlayer, updateValues.Reinterpret());
-			}*/
-
-				//We start with the new size as the original size
-				//From there we need to determine the object type and do the shifting
-				//of both the size and any unit fields that didn't get synced.
-				//Blocksize itself is determined by the bitmasksize divide by bitcount for the fields (32)
-				int bitMaskSize = updateCollection.UpdateMask.Length;
-
-			if(objectGuid.isType(EntityGuidMask.Item))
-			{
-				//Item could be an item or a container
-				//the guid mask doesn't give us enough information.
-				//the length of the mask does though.
-				if(bitMaskSize > (int)EItemFields_Vanilla.ITEM_END + 1)
-				{
-					//it is a container
-					bitMaskSize = (int)EContainerFields.CONTAINER_END;
-					int newBlockCount = (bitMaskSize + 31) / 32;
-					//(valuesCount + CLIENT_UPDATE_MASK_BITS - 1) / CLIENT_UPDATE_MASK_BITS;
-					BitArray newBitMask = new BitArray(newBlockCount * 32, false);
-
-					ReplaceUpdateItemIndicies(updateCollection, newBitMask);
-
-					int offset = (int)EItemFields.ITEM_END - (int)EItemFields_Vanilla.ITEM_END - 2;
-					int i = (int)EItemFields_Vanilla.ITEM_END;
-					try
-					{
-						//Containers also have container fields that need to be replaced
-						for(; i < updateCollection.UpdateMask.Length && i + offset < newBitMask.Length; i++)
-							newBitMask.Set(i + offset, updateCollection.UpdateMask[i]);
-					}
-					catch(Exception e)
-					{
-						throw new InvalidOperationException($"Failed to set. Original Length: {updateCollection.UpdateMask.Length} New Length: {newBitMask.Length} i: {i} i with offset: {i + offset}");
-						throw;
-					}
-
-					return new UpdateFieldValueCollection(newBitMask, updateCollection.UpdateDiffValues);
-				}
-				else
-				{
-					//It is just an item
-					bitMaskSize = (int)EItemFields.ITEM_END;
-
-					int newBlockCount = (bitMaskSize + 31) / 32;
-					//(valuesCount + CLIENT_UPDATE_MASK_BITS - 1) / CLIENT_UPDATE_MASK_BITS;
-					BitArray newBitMask = new BitArray(newBlockCount * 32, false);
-
-					ReplaceUpdateItemIndicies(updateCollection, newBitMask);
-
-					return new UpdateFieldValueCollection(newBitMask, updateCollection.UpdateDiffValues);
-				}
-			}
-
-			return updateCollection;
+			return values;
 		}
 
 		private static void ReplaceUpdateItemIndicies(UpdateFieldValueCollection updateCollection, BitArray newBitMask)
@@ -574,7 +447,7 @@ namespace FreecraftCore
 
 			//TODO: Remove stationary hack
 			if(movementDataUpdateFlags.HasFlag(ObjectUpdateFlags_Vanilla.UPDATEFLAG_SELF))
-				flags |= ObjectUpdateFlags.UPDATEFLAG_SELF | ObjectUpdateFlags.UPDATEFLAG_STATIONARY_POSITION;
+				flags |= ObjectUpdateFlags.UPDATEFLAG_SELF;
 
 			//This is odd, but they will send the guid of the target if this flag is enabled
 			//So I assume we have to do the same here.
@@ -591,7 +464,8 @@ namespace FreecraftCore
 
 		private static ObjectUpdateValuesObjectBlock RebuildUpdateValuesBlock(ObjectUpdateValuesObjectBlock_Vanilla objectUpdateValuesObjectBlockVanilla)
 		{
-			return new ObjectUpdateValuesObjectBlock(objectUpdateValuesObjectBlockVanilla.ObjectToUpdate, objectUpdateValuesObjectBlockVanilla.UpdateValuesCollection);
+			UpdateFieldValueCollection fieldValueCollection = ToWotlkUpdateValues(objectUpdateValuesObjectBlockVanilla.ObjectToUpdate, objectUpdateValuesObjectBlockVanilla.UpdateValuesCollection);
+			return new ObjectUpdateValuesObjectBlock(objectUpdateValuesObjectBlockVanilla.ObjectToUpdate, fieldValueCollection);
 		}
 	}
 }
