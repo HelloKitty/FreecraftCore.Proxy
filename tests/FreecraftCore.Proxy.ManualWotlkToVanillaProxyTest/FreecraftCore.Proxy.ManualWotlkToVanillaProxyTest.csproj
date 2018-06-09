@@ -65,6 +65,8 @@
     <Compile Include="Handlers\Server\GameCharacterListResponsePayloadHandler.cs" />
     <Compile Include="Handlers\WotlkToVanillaGameDefaultClientRequestPayloadHandler.cs" />
     <Compile Include="Handlers\WotlkToVanillaGameDefaultServerRequestPayloadHandler.cs" />
+    <Compile Include="TypeConverters\Character\VanillaToWotlkCharacterScreenCharacterTypeConverter.cs" />
+    <Compile Include="TypeConverters\Character\VanillaToWotlkCharacterScreenItemTypeConverter.cs" />
     <Compile Include="TypeConverters\Update\VanillaToWotlkUpdateBlockCollection.cs" />
     <Compile Include="TypeConverters\Update\VanillaToWotlkObjectUpdateBlock.cs" />
     <Compile Include="TypeConverters\Update\VanillaToWotlkObjectUpdateDestroyObjectBlockTypeConverter.cs" />

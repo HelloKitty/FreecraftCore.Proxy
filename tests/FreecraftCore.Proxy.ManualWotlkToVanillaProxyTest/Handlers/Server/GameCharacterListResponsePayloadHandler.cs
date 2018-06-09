@@ -21,11 +21,13 @@ namespace FreecraftCore
 	[ServerPayloadHandler]
 	public sealed class GameCharacterListResponsePayloadHandler : BaseGameServerPayloadHandler<CharacterListResponse_Vanilla>
 	{
+		public ITypeConverterProvider<CharacterScreenCharacter_Vanilla, CharacterScreenCharacter> CharacterConverter { get; }
+
 		/// <inheritdoc />
-		public GameCharacterListResponsePayloadHandler([NotNull] ILog logger) 
+		public GameCharacterListResponsePayloadHandler([NotNull] ILog logger, [NotNull] ITypeConverterProvider<CharacterScreenCharacter_Vanilla, CharacterScreenCharacter> characterConverter) 
 			: base(logger)
 		{
-
+			CharacterConverter = characterConverter ?? throw new ArgumentNullException(nameof(characterConverter));
 		}
 
 		/// <inheritdoc />
@@ -36,38 +38,10 @@ namespace FreecraftCore
 
 			//Transforms all the characters to their wotlk structure.
 			CharacterScreenCharacter[] characters = payload.Characters
-				.Select(TransformCharacterToWotlk)
+				.Select(CharacterConverter.Convert)
 				.ToArray();
 
 			return context.ProxyConnection.SendMessage(new CharacterListResponse(characters));
-		}
-
-		/// <summary>
-		/// TODO DOC
-		/// </summary>
-		/// <param name="vanillaItem"></param>
-		/// <returns></returns>
-		private CharacterScreenItem TransformItemToWotlk(CharacterScreenItem_Vanilla vanillaItem)
-		{
-			//TODO: Is 0 ok for enchant id?
-			return new CharacterScreenItem(vanillaItem.DisplayId, vanillaItem.InventoryType, 0);
-		}
-
-		private CharacterScreenCharacter TransformCharacterToWotlk(CharacterScreenCharacter_Vanilla vanillaCharacter)
-		{
-			CharacterScreenItem[] wotlkCharacterItems = vanillaCharacter.VisualEquipmentItems
-				.Select(TransformItemToWotlk)
-				.ToArray();
-
-			//TODO: Trinitycore doesn't send this bag data? Why did Jackpoz have this? What should we send?
-			return new CharacterScreenCharacter(vanillaCharacter.Data, 0, vanillaCharacter.isFirstLogin, vanillaCharacter.PetInformation, wotlkCharacterItems, BuildCharacterBags());
-		}
-
-		private static CharacterScreenBag[] BuildCharacterBags()
-		{
-			//TODO: Once the ctor for the bags is not private anymore we should switch off activator.
-			return Enumerable.Repeat(new CharacterScreenBag(0, 0, 0), 4)
-				.ToArray();
-		}
+		}	
 	}
 }
