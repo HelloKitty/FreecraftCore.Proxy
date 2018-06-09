@@ -76,7 +76,21 @@ namespace FreecraftCore
 				NetworkOperationCode.SMSG_MONSTER_MOVE,
 
 				//TODO: Renable when chat transformation is complete
-				NetworkOperationCode.SMSG_MESSAGECHAT
+				NetworkOperationCode.SMSG_MESSAGECHAT,
+
+				NetworkOperationCode.SMSG_GUILD_QUERY_RESPONSE,
+
+				NetworkOperationCode.SMSG_EMOTE,
+
+				NetworkOperationCode.SMSG_INIT_WORLD_STATES,
+
+				NetworkOperationCode.SMSG_WEATHER,
+
+				NetworkOperationCode.SMSG_COMPRESSED_MOVES,
+
+				NetworkOperationCode.SMSG_DESTROY_OBJECT,
+
+				NetworkOperationCode.SMSG_CREATURE_QUERY_RESPONSE
 			};
 
 		/// <inheritdoc />

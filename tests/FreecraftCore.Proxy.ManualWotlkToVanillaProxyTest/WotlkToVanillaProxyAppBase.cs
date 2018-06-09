@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Autofac;
@@ -43,6 +44,34 @@ namespace FreecraftCore
 		}
 
 		/// <inheritdoc />
+		protected override ContainerBuilder RegisterHandlerDependencies(ContainerBuilder builder)
+		{
+			base.RegisterHandlerDependencies(builder);
+
+			//Register all the type converters in the assembly
+			foreach(Type t in GetAllTypesImplementingOpenGenericType(typeof(ITypeConverterProvider<,>), typeof(WotlkToVanillaMovementInfoTypeConverter).Assembly))
+				builder.RegisterType(t)
+					.AsSelf()
+					.AsImplementedInterfaces()
+					.SingleInstance();
+
+			return builder;
+		}
+
+		public static IEnumerable<Type> GetAllTypesImplementingOpenGenericType(Type openGenericType, Assembly assembly)
+		{
+			return from x in assembly.GetTypes()
+				from z in x.GetInterfaces()
+				let y = x.BaseType
+				where
+					(y != null && y.IsGenericType &&
+						openGenericType.IsAssignableFrom(y.GetGenericTypeDefinition())) ||
+					(z.IsGenericType &&
+						openGenericType.IsAssignableFrom(z.GetGenericTypeDefinition()))
+				select x;
+		}
+
+		/// <inheritdoc />
 		protected override ContainerBuilder RegisterDefaultHandlers(ContainerBuilder builder)
 		{
 			builder.RegisterType<WotlkToVanillaGameDefaultServerRequestPayloadHandler>()
@@ -55,6 +84,15 @@ namespace FreecraftCore
 				.As<GameDefaultClientRequestHandler>()
 				.AsImplementedInterfaces()
 				.AsSelf()
+				.SingleInstance();
+
+			//These two handlers are special, they handle movement.
+			builder.RegisterType<WotlkToVanillaClientMovementPayloadHandler>()
+				.Named<IPeerMessageHandler<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>>("Client")
+				.SingleInstance();
+
+			builder.RegisterType<WotlkToVanillaServerMovementPayloadHandler>()
+				.Named<IPeerMessageHandler<GamePacketPayload, GamePacketPayload, IProxiedMessageContext<GamePacketPayload, GamePacketPayload>>>("Server")
 				.SingleInstance();
 
 			return builder;

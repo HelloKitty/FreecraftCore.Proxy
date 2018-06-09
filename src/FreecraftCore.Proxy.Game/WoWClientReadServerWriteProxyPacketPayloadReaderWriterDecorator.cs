@@ -107,7 +107,13 @@ namespace FreecraftCore
 		/// <inheritdoc />
 		public override Task WriteAsync(byte[] bytes, int offset, int count)
 		{
-			return DecoratedClient.WriteAsync(bytes, offset, count);
+			//We are making the assumption they are writing a full payload
+			//and opcode. So we only need to serialize ushort length
+			//and then the length and opcode should be encrypted
+			ServerPacketHeader header = new ServerPacketHeader(count);
+			byte[] serverPacketHeader = Serializer.Serialize(header);
+
+			return CryptAndSend(bytes, serverPacketHeader, offset, count);
 		}
 
 		/// <inheritdoc />
@@ -122,31 +128,37 @@ namespace FreecraftCore
 				ServerPacketHeader header = new ServerPacketHeader(payloadData.Length);
 				byte[] serverPacketHeader = Serializer.Serialize(header);
 
-				//VERY critical we lock here otherwise we could write a header and then another unrelated body could be written inbetween
-				using(await writeSynObj.LockAsync().ConfigureAwait(false))
-				{
-					//We should check crypto first. If it's init then we need to encrypt the serverPacketHeader
-					if(CryptoService.isInitialized)
-					{
-						CryptoService.EncryptionService.ProcessBytes(serverPacketHeader, 0, serverPacketHeader.Length, serverPacketHeader, 0);
-
-						//Encrypt the opcode on the payload data too
-						CryptoService.EncryptionService.ProcessBytes(payloadData, 0, 2, payloadData, 0);
-					}
-
-					//It's important to always write the header first
-					await DecoratedClient.WriteAsync(serverPacketHeader)
-						.ConfigureAwait(false);
-
-					await DecoratedClient.WriteAsync(payloadData, 0, payloadData.Length)
-						.ConfigureAwait(false);
-				}
+				await CryptAndSend(payloadData, serverPacketHeader, 0, payloadData.Length);
 			}
 			catch(Exception e)
 			{
 				if(Logger.IsErrorEnabled)
 					Logger.Error($"Client proxy encountered Exception: {e.Message} \n\n {e.StackTrace}");
 				throw;
+			}
+		}
+
+		//TODO: Validate sizes
+		private async Task CryptAndSend(byte[] payloadData, byte[] serverPacketHeader, int payloadDataOffset, int payloadDataCount)
+		{
+			//VERY critical we lock here otherwise we could write a header and then another unrelated body could be written inbetween
+			using(await writeSynObj.LockAsync().ConfigureAwait(false))
+			{
+				//We should check crypto first. If it's init then we need to encrypt the serverPacketHeader
+				if(CryptoService.isInitialized)
+				{
+					CryptoService.EncryptionService.ProcessBytes(serverPacketHeader, 0, serverPacketHeader.Length, serverPacketHeader, 0);
+
+					//Encrypt the opcode on the payload data too
+					CryptoService.EncryptionService.ProcessBytes(payloadData, payloadDataOffset, 2, payloadData, payloadDataOffset);
+				}
+
+				//It's important to always write the header first
+				await DecoratedClient.WriteAsync(serverPacketHeader)
+					.ConfigureAwait(false);
+
+				await DecoratedClient.WriteAsync(payloadData, payloadDataOffset, payloadDataCount)
+					.ConfigureAwait(false);
 			}
 		}
 

@@ -39,11 +39,12 @@ namespace FreecraftCore
 
 			byte[] sessionKey = ReadSessionKeyFromProcessMemory(processId);
 
-			//We should send the auth request before initializing encryption
-			CryptoInitializer.Initialize(sessionKey);
-
+			//TODO: This isn't safe, because it is possible we recieve something before we initialize encryption.
 			await context.ProxyConnection.SendMessageImmediately(payload, DeliveryMethod.ReliableOrdered)
 				.ConfigureAwait(false);
+
+			//We should send the auth request before initializing encryption
+			CryptoInitializer.Initialize(sessionKey);
 		}
 #pragma warning restore AsyncFixer01 // Unnecessary async/await usage
 

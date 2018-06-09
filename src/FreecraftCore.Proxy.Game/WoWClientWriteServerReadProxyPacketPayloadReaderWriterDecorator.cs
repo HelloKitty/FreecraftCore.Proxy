@@ -102,11 +102,20 @@ namespace FreecraftCore
 		/// <inheritdoc />
 		public override Task WriteAsync(byte[] bytes, int offset, int count)
 		{
-			return DecoratedClient.WriteAsync(bytes, offset, count);
+			//We are making the assumption they are writing a full payload
+			//and opcode. So we only need to serialize ushort length
+			//and then the length and opcode should be encrypted
+			OutgoingClientPacketHeader header = new OutgoingClientPacketHeader(count - 2, (NetworkOperationCode)bytes.Reinterpret<short>(offset));
+
+			//We subtract 2 from the payload data length because first 2 bytes are opcode and header contains opcode.
+			//Then we reinterpet the first 2 bytes of the payload data because it's the opcode we need to use.
+			byte[] clientPacketHeader = Serializer.Serialize(header);
+
+			return CryptAndSend(bytes, clientPacketHeader, offset, count);
 		}
 
 		/// <inheritdoc />
-		public virtual async Task WriteAsync(TWritePayloadBaseType payload)
+		public virtual Task WriteAsync(TWritePayloadBaseType payload)
 		{
 			//Serializer the payload first so we can build the header
 			byte[] payloadData = Serializer.Serialize(payload);
@@ -119,11 +128,16 @@ namespace FreecraftCore
 			//Then we reinterpet the first 2 bytes of the payload data because it's the opcode we need to use.
 			byte[] clientPacketHeader = Serializer.Serialize(header);
 
+			return CryptAndSend(payloadData, clientPacketHeader, 0, payloadData.Length);
+		}
+
+		private async Task CryptAndSend(byte[] payloadData, byte[] clientPacketHeader, int payloadBytesOffset, int payloadBytesCount)
+		{
 			//VERY critical we lock here otherwise we could write a header and then another unrelated body could be written inbetween
 			using(await writeSynObj.LockAsync().ConfigureAwait(false))
 			{
 				//We should check crypto first. If it's init then we need to encrypt the serverPacketHeader
-				if(CryptoService.isInitialized && payload.GetType() != typeof(SessionAuthProofRequest)) //TODO: This is a hack, can we fix this?
+				if(CryptoService.isInitialized) //TODO: This is a hack, can we fix this?
 					CryptoService.EncryptionService.ProcessBytes(clientPacketHeader, 0, clientPacketHeader.Length, clientPacketHeader, 0);
 
 				//It's important to always write the header first
@@ -132,11 +146,9 @@ namespace FreecraftCore
 
 				//We skip the first 2 bytes of the payload because it contains the opcode
 				//Which is suppose to be in the header. Therefore we don't wnat to write it twice
-				await DecoratedClient.WriteAsync(payloadData, 2, header.PayloadSize)
+				await DecoratedClient.WriteAsync(payloadData, 2 + payloadBytesOffset, payloadBytesCount - 2)
 					.ConfigureAwait(false);
 			}
-
-			//Console.WriteLine($"Send to client: {payload.GetType()}");
 		}
 
 		/// <inheritdoc />
@@ -180,6 +192,8 @@ namespace FreecraftCore
 					return null;
 
 				Console.WriteLine($"Server Debug OpCode: {(NetworkOperationCode)PacketPayloadReadBuffer.Reinterpret<ushort>()}:{PacketPayloadReadBuffer.Reinterpret<short>()}");
+
+				//Console.ReadKey();
 
 				//Deserialize the bytes starting from the begining but ONLY read up to the payload size. We reuse this buffer and it's large
 				//so if we don't specify the length we could end up with an issue.

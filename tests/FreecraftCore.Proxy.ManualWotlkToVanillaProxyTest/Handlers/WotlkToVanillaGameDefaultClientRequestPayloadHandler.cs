@@ -35,7 +35,14 @@ namespace FreecraftCore
 				
 				//Required to recieve updates about the world
 				//NetworkOperationCode.CMSG_ZONEUPDATE,
-				NetworkOperationCode.CMSG_SET_ACTIVE_VOICE_CHANNEL
+				NetworkOperationCode.CMSG_SET_ACTIVE_VOICE_CHANNEL,
+
+				//TODO: This structure is not the same. We need to it for 1.12.1
+				NetworkOperationCode.CMSG_ITEM_QUERY_SINGLE,
+
+				NetworkOperationCode.CMSG_QUESTGIVER_STATUS_QUERY,
+
+				NetworkOperationCode.CMSG_TIME_SYNC_RESP
 			};
 
 		/// <inheritdoc />

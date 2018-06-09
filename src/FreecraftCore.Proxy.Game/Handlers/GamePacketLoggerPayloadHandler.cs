@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Common.Logging;
 using JetBrains.Annotations;
@@ -11,8 +12,7 @@ using Reinterpret.Net;
 
 namespace FreecraftCore
 {
-	[ServerPayloadHandler]
-	public class GameServerPacketLoggerServerPayloadHandler<TUnimplementedPacketPayloadType> : BaseGameServerPayloadHandler<TUnimplementedPacketPayloadType>
+	public class GamePacketLoggerPayloadHandler<TUnimplementedPacketPayloadType> : BaseGamePayloadHandler<TUnimplementedPacketPayloadType>
 		where TUnimplementedPacketPayloadType : GamePacketPayload, IUnimplementedGamePacketPayload
 	{
 		/// <summary>
@@ -32,25 +32,47 @@ namespace FreecraftCore
 
 		private static string BaseFileName { get; } = OpCode.ToString();
 
-		static GameServerPacketLoggerServerPayloadHandler()
+		static GamePacketLoggerPayloadHandler()
 		{
-			if(!Directory.Exists("Packet"))
-				Directory.CreateDirectory("Packet");
-
-			if(!Directory.Exists(PacketLogPath()))
-				Directory.CreateDirectory(PacketLogPath());
+			
 		}
+
+		/// <summary>
+		/// Lazily generated RootPath.
+		/// It is generated as lazy so that the folder and directory is only created when the
+		/// packet is first seen.
+		/// </summary>
+		public static Lazy<string> RootPath { get; } = new Lazy<string>(() =>
+		{
+			string rootPath = "Packet";
+			string subfolderPath = $"{typeof(TUnimplementedPacketPayloadType).GetCustomAttribute<GamePayloadOperationCodeAttribute>().OperationCode}";
+			string fullRootPath = Path.Combine(rootPath, subfolderPath);
+
+			if(!Directory.Exists(rootPath))
+				Directory.CreateDirectory(rootPath);
+
+			if(!Directory.Exists(fullRootPath))
+				Directory.CreateDirectory(fullRootPath);
+
+			return fullRootPath;
+		}, true);
 
 		private static string PacketLogPath()
 		{
-			return $"Packet/{typeof(TUnimplementedPacketPayloadType).GetCustomAttribute<GamePayloadOperationCodeAttribute>().OperationCode}";
+			return RootPath.Value;
 		}
 
 		/// <inheritdoc />
-		public GameServerPacketLoggerServerPayloadHandler([NotNull] ILog logger, bool shouldForward) 
+		public GamePacketLoggerPayloadHandler([NotNull] ILog logger, bool shouldForward) 
 			: base(logger)
 		{
 			ShouldForward = shouldForward;
+		}
+
+		/// <inheritdoc />
+		public GamePacketLoggerPayloadHandler([NotNull] ILog logger)
+			: this(logger, true)
+		{
 		}
 
 		/// <inheritdoc />

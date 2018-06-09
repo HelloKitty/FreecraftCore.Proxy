@@ -8,12 +8,5 @@ using JetBrains.Annotations;
 
 namespace FreecraftCore
 {
-	public sealed class GameServerAddonCheckResponsePayloadCaptureHandler : GameServerPacketLoggerServerPayloadHandler<SMSG_ADDON_INFO_DTO_PROXY>
-	{
-		/// <inheritdoc />
-		public GameServerAddonCheckResponsePayloadCaptureHandler([NotNull] ILog logger) 
-			: base(logger, true)
-		{
-		}
-	}
+
 }

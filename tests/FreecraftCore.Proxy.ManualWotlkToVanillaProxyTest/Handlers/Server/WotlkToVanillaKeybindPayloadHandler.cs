@@ -22,7 +22,7 @@ namespace FreecraftCore
 		{
 			//TODO: Add constant for Keybind length
 			//TC always sends 1 so we'll send 1.
-			return new SMSG_ACTION_BUTTONS_Payload(SMSG_ACTION_BUTTONS_Payload.State.Initial, payload.ButtonData.Concat(Enumerable.Repeat(new ActionButtonData(0), 144 - payload.ButtonData.Count)).ToArray());
+			return new SMSG_ACTION_BUTTONS_Payload(SMSG_ACTION_BUTTONS_Payload.State.Swapping, payload.ButtonData.Concat(Enumerable.Repeat(new ActionButtonData(0), 144 - payload.ButtonData.Count)).ToArray());
 		}
 	}
 }

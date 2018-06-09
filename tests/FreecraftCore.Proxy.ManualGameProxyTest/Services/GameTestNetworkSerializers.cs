@@ -31,7 +31,7 @@ namespace FreecraftCore
 			SerializerService serializer = new SerializerService();
 
 			//TODO: Renable object update
-			GamePacketMetadataMarker
+			/*GamePacketMetadataMarker
 				.SerializableTypes
 				.Where(p => !p.Name.ToUpper().Contains("ADDON"))
 				.ToList()
@@ -43,17 +43,17 @@ namespace FreecraftCore
 			//Registeration can be slow.
 			//foreach(Type t in GamePacketMetadataMarker.GamePacketPayloadTypesWithDynamicProxies.Value)
 			//	serializer.RegisterType(t);
-			foreach(Type t in GamePacketStubMetadataMarker.GamePacketPayloadStubTypes.Where(s => GamePacketMetadataMarker.UnimplementedOperationCodes.Value.Contains(s.GetCustomAttribute<GamePayloadOperationCodeAttribute>().OperationCode))/*.Concat(new Type[2] { typeof(SMSG_COMPRESSED_UPDATE_OBJECT_DTO_PROXY), typeof(SMSG_UPDATE_OBJECT_DTO_PROXY)})*/)
-				serializer.RegisterType(t);
+			foreach(Type t in GamePacketStubMetadataMarker.GamePacketPayloadStubTypes.Where(s => GamePacketMetadataMarker.UnimplementedOperationCodes.Value.Contains(s.GetCustomAttribute<GamePayloadOperationCodeAttribute>().OperationCode))
+				serializer.RegisterType(t);*/
 
-			//Manually register PROXY_DTO
-			//serializer.RegisterType(typeof(SMSG_COMPRESSED_UPDATE_OBJECT_DTO_PROXY));
-			//serializer.RegisterType(typeof(SMSG_UPDATE_OBJECT_DTO_PROXY));
-			serializer.RegisterType<SMSG_ADDON_INFO_DTO_PROXY>();
+			foreach(Type t in GamePacketStubMetadataMarker.GamePacketPayloadStubTypes)
+				if(t != typeof(CMSG_AUTH_SESSION_DTO_PROXY))
+					serializer.RegisterType(t);
 
 			//Also the header types
 			serializer.RegisterType<ServerPacketHeader>();
 			serializer.RegisterType<OutgoingClientPacketHeader>();
+			serializer.RegisterType<SessionAuthProofRequest>();
 
 			serializer.Compile();
 

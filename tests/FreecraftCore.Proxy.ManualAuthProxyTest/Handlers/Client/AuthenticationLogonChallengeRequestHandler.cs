@@ -14,7 +14,8 @@ namespace FreecraftCore
 		/// <inheritdoc />
 		public override Task HandleMessage(IProxiedMessageContext<AuthenticationServerPayload, AuthenticationClientPayload> context, AuthLogonChallengeRequest payload)
 		{
-			return context.ProxyConnection.SendMessage(new AuthLogonChallengeRequest(payload.Protocol, GameType.WoW, ExpansionType.WrathOfTheLichKing, 3, 5, ClientBuild.Wotlk_3_3_5a, PlatformType.x64, OperatingSystemType.Mac, LocaleType.enUS, payload.IP, payload.Identity));
+			return context.ProxyConnection.SendMessage(payload);
+			//return context.ProxyConnection.SendMessage(new AuthLogonChallengeRequest(payload.Protocol, GameType.WoW, ExpansionType.WrathOfTheLichKing, 3, 5, ClientBuild.Wotlk_3_3_5a, PlatformType.x64, OperatingSystemType.Mac, LocaleType.enUS, payload.IP, payload.Identity));
 		}
 	}
 }
