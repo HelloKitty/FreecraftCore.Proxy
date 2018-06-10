@@ -49,6 +49,8 @@
     <Compile Include="Handlers\Client\WotlkToVanillaUpdateAccountDataPayloadHandler.cs" />
     <Compile Include="Handlers\Client\WotlkToVanillaRealmSplitPayloadHandler.cs" />
     <Compile Include="Handlers\Client\WotlkToVanillaSessionAuthProofRequestPayloadHandler.cs" />
+    <Compile Include="Handlers\Server\Query\WotlkToVanillaQuestGiveStatusResponsePayloadHandler.cs" />
+    <Compile Include="Handlers\Server\WotlkToVanillaDestroyObjectPayloadHandler.cs" />
     <Compile Include="Handlers\Server\Discards\WotlkToVanillaWardenDataDiscardHandler.cs" />
     <Compile Include="Handlers\Server\Discards\WotlkToVanillaAddonCheckPayloadHandler.cs" />
     <Compile Include="Handlers\Server\Movement\WotlkToVanillaClientMovementPayloadHandler.cs" />
@@ -67,6 +69,7 @@
     <Compile Include="Handlers\WotlkToVanillaGameDefaultServerRequestPayloadHandler.cs" />
     <Compile Include="TypeConverters\Character\VanillaToWotlkCharacterScreenCharacterTypeConverter.cs" />
     <Compile Include="TypeConverters\Character\VanillaToWotlkCharacterScreenItemTypeConverter.cs" />
+    <Compile Include="TypeConverters\Enums\QuestGiverStatusTypeConverter.cs" />
     <Compile Include="TypeConverters\Update\VanillaToWotlkUpdateBlockCollection.cs" />
     <Compile Include="TypeConverters\Update\VanillaToWotlkObjectUpdateBlock.cs" />
     <Compile Include="TypeConverters\Update\VanillaToWotlkObjectUpdateDestroyObjectBlockTypeConverter.cs" />
