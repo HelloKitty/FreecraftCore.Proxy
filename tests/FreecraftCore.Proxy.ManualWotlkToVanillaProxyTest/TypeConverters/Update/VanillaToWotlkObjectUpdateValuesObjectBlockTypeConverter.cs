@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Common.Logging;
+using JetBrains.Annotations;
 using Reinterpret.Net;
 
 namespace FreecraftCore
@@ -14,9 +16,11 @@ namespace FreecraftCore
 	/// </summary>
 	public sealed class VanillaToWotlkObjectUpdateValuesObjectBlockTypeConverter : ITypeConverterProvider<ObjectUpdateValuesObjectBlock_Vanilla, ObjectUpdateValuesObjectBlock>
 	{
-		public VanillaToWotlkObjectUpdateValuesObjectBlockTypeConverter()
+		private ILog Logger { get; }
+
+		public VanillaToWotlkObjectUpdateValuesObjectBlockTypeConverter([NotNull] ILog logger)
 		{
-			
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
 		/// <inheritdoc />
@@ -40,8 +44,69 @@ namespace FreecraftCore
 			}
 			else if(objectGuid.isType(EntityGuidMask.Unit))
 				return BuildWotlkUnitUpdateFieldCollection(updateCollection);
+			else if(objectGuid.isType(EntityGuidMask.Container))
+			{
+				if(updateCollection.UpdateMask.Length > 63)
+					return BuildWotlkContainerUpdateFieldCollection(updateCollection);
+				else
+					return BuildWotlkItemUpdateFieldCollection(updateCollection);
+			}
+			else if(objectGuid.isType(EntityGuidMask.GameObject))
+				return BuildWotlkGameObjectUpdateFieldCollection(updateCollection);
+			else
+				if(Logger.IsWarnEnabled)
+					Logger.Warn($"Failed to handle update values for Entity: {objectGuid.RawGuidValue}");
 
 			return null;
+		}
+
+		private UpdateFieldValueCollection BuildWotlkGameObjectUpdateFieldCollection(UpdateFieldValueCollection updateCollection)
+		{
+			//We need to build a new dictionary of update values because the value array could likely change too
+			//TODO: Don't hardcode size value, compute block size manually
+			BitArray bitMaskPlayer = new BitArray((int)32, false);
+			Dictionary<int, int> valuesDictionary = new Dictionary<int, int>(updateCollection.UpdateDiffValues.Length / sizeof(int));
+			int valueIndex = 0;
+
+			InitializeObjectFields(updateCollection, valuesDictionary, ref valueIndex);
+			InitializeGameObjectFields(updateCollection, valuesDictionary, ref valueIndex);
+
+			int[] values = SetBitMaskAndBuildValues(bitMaskPlayer, valuesDictionary);
+
+			return new UpdateFieldValueCollection(bitMaskPlayer, values.Reinterpret());
+		}
+
+		private UpdateFieldValueCollection BuildWotlkItemUpdateFieldCollection(UpdateFieldValueCollection updateCollection)
+		{
+			//We need to build a new dictionary of update values because the value array could likely change too
+			//TODO: Don't hardcode size value, compute block size manually
+			BitArray bitMaskPlayer = new BitArray((int)64, false);
+			Dictionary<int, int> valuesDictionary = new Dictionary<int, int>(updateCollection.UpdateDiffValues.Length / sizeof(int));
+			int valueIndex = 0;
+
+			InitializeObjectFields(updateCollection, valuesDictionary, ref valueIndex);
+			InitializeItemFields(updateCollection, valuesDictionary, ref valueIndex);
+
+			int[] values = SetBitMaskAndBuildValues(bitMaskPlayer, valuesDictionary);
+
+			return new UpdateFieldValueCollection(bitMaskPlayer, values.Reinterpret());
+		}
+
+		private UpdateFieldValueCollection BuildWotlkContainerUpdateFieldCollection(UpdateFieldValueCollection updateCollection)
+		{
+			//We need to build a new dictionary of update values because the value array could likely change too
+			//TODO: Don't hardcode size value, compute block size manually
+			BitArray bitMaskPlayer = new BitArray((int)128, false);
+			Dictionary<int, int> valuesDictionary = new Dictionary<int, int>(updateCollection.UpdateDiffValues.Length / sizeof(int));
+			int valueIndex = 0;
+
+			InitializeObjectFields(updateCollection, valuesDictionary, ref valueIndex);
+			InitializeItemFields(updateCollection, valuesDictionary, ref valueIndex);
+			InitializeContainerFields(updateCollection, valuesDictionary, ref valueIndex);
+
+			int[] values = SetBitMaskAndBuildValues(bitMaskPlayer, valuesDictionary);
+
+			return new UpdateFieldValueCollection(bitMaskPlayer, values.Reinterpret());
 		}
 
 		private static UpdateFieldValueCollection BuildWotlkPlayerUpdateFieldCollection(UpdateFieldValueCollection updateCollection)
@@ -53,7 +118,6 @@ namespace FreecraftCore
 			int valueIndex = 0;
 
 			InitializeObjectFields(updateCollection, valuesDictionary, ref valueIndex);
-
 			InitializeUnitFields(updateCollection, valuesDictionary, ref valueIndex);
 
 			//if(!ValuesDictionary.ContainsKey((int)EUnitFields.UNIT_FIELD_FLAGS_2)) ValuesDictionary.Add((int)EUnitFields.UNIT_FIELD_FLAGS_2, 264192);
@@ -92,6 +156,99 @@ namespace FreecraftCore
 						catch(Exception e)
 						{
 							throw new InvalidOperationException($"Failed to insert: i:{i}:{((EUnitFields_Vanilla)i).ToString()} [{i + shiftAmount}] [{((EUnitFields)(i + shiftAmount)).ToString()}] {updateCollection.UpdateDiffValues.Reinterpret<int>(valueIndex * sizeof(int))} into dictionary. \n\n Exception: {e.Message}", e);
+						}
+					}
+
+					//no matter what the value index should increase. Because
+					//otherwise it will get descyned from the new values
+					valueIndex++;
+				}
+			}
+		}
+
+		private static void InitializeContainerFields(UpdateFieldValueCollection updateCollection, Dictionary<int, int> valuesDictionary, ref int valueIndex)
+		{
+			for(int i = (int)EItemFields_Vanilla.ITEM_END; i < updateCollection.UpdateMask.Length && i < (int)EContainerFields_Vanilla.CONTAINER_END; i++)
+			{
+				bool shouldWrite = VanillaToWotlkConverter.ConvertUpdateFieldsContainer((EContainerFields_Vanilla)i, out int shiftAmount);
+
+				//We need to track the index of nonwritten to wotlk, but written to the vanilla update block,
+				//so that we may remove the byte chunk that represents the indicies
+				if(updateCollection.UpdateMask[i])
+				{
+					if(shouldWrite)
+					{
+						try
+						{
+							//We store in a dictionary with the value so that it may be written
+							//TODO: Store only index so we can do quick memcpy to new values array in the future for perf
+							valuesDictionary.Add(i + shiftAmount, updateCollection.UpdateDiffValues.Reinterpret<int>(valueIndex * sizeof(int)));
+						}
+						catch(Exception e)
+						{
+							throw new InvalidOperationException($"Failed to insert: i:{i}:{((EContainerFields_Vanilla)i).ToString()} [{i + shiftAmount}] [{((EContainerFields_Vanilla)(i + shiftAmount)).ToString()}] {updateCollection.UpdateDiffValues.Reinterpret<int>(valueIndex * sizeof(int))} into dictionary. \n\n Exception: {e.Message}", e);
+						}
+					}
+
+					//no matter what the value index should increase. Because
+					//otherwise it will get descyned from the new values
+					valueIndex++;
+				}
+			}
+		}
+
+		private static void InitializeGameObjectFields(UpdateFieldValueCollection updateCollection, Dictionary<int, int> valuesDictionary, ref int valueIndex)
+		{
+			for(int i = (int)EObjectFields.OBJECT_END; i < updateCollection.UpdateMask.Length && i < (int)EGameObjectFields_Vanilla.OBJECT_END; i++)
+			{
+				bool shouldWrite = VanillaToWotlkConverter.ConvertUpdateFieldsGameObject((EGameObjectFields_Vanilla)i, out int shiftAmount);
+
+				//We need to track the index of nonwritten to wotlk, but written to the vanilla update block,
+				//so that we may remove the byte chunk that represents the indicies
+				if(updateCollection.UpdateMask[i])
+				{
+					if(shouldWrite)
+					{
+						try
+						{
+							//We store in a dictionary with the value so that it may be written
+							//TODO: Store only index so we can do quick memcpy to new values array in the future for perf
+							valuesDictionary.Add(i + shiftAmount, updateCollection.UpdateDiffValues.Reinterpret<int>(valueIndex * sizeof(int)));
+						}
+						catch(Exception e)
+						{
+							throw new InvalidOperationException($"Failed to insert: i:{i}:{((EGameObjectFields_Vanilla)i).ToString()} [{i + shiftAmount}] [{((EGameObjectFields_Vanilla)(i + shiftAmount)).ToString()}] {updateCollection.UpdateDiffValues.Reinterpret<int>(valueIndex * sizeof(int))} into dictionary. \n\n Exception: {e.Message}", e);
+						}
+					}
+
+					//no matter what the value index should increase. Because
+					//otherwise it will get descyned from the new values
+					valueIndex++;
+				}
+			}
+		}
+
+		private static void InitializeItemFields(UpdateFieldValueCollection updateCollection, Dictionary<int, int> valuesDictionary, ref int valueIndex)
+		{
+			for(int i = (int)EObjectFields.OBJECT_END; i < updateCollection.UpdateMask.Length && i < (int)EItemFields_Vanilla.ITEM_END; i++)
+			{
+				bool shouldWrite = VanillaToWotlkConverter.ConvertUpdateFieldsItem((EItemFields_Vanilla)i, out int shiftAmount);
+
+				//We need to track the index of nonwritten to wotlk, but written to the vanilla update block,
+				//so that we may remove the byte chunk that represents the indicies
+				if(updateCollection.UpdateMask[i])
+				{
+					if(shouldWrite)
+					{
+						try
+						{
+							//We store in a dictionary with the value so that it may be written
+							//TODO: Store only index so we can do quick memcpy to new values array in the future for perf
+							valuesDictionary.Add(i + shiftAmount, updateCollection.UpdateDiffValues.Reinterpret<int>(valueIndex * sizeof(int)));
+						}
+						catch(Exception e)
+						{
+							throw new InvalidOperationException($"Failed to insert: i:{i}:{((EItemFields_Vanilla)i).ToString()} [{i + shiftAmount}] [{((EItemFields_Vanilla)(i + shiftAmount)).ToString()}] {updateCollection.UpdateDiffValues.Reinterpret<int>(valueIndex * sizeof(int))} into dictionary. \n\n Exception: {e.Message}", e);
 						}
 					}
 

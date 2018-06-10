@@ -19,7 +19,7 @@ namespace FreecraftCore.Game
 
 			GameProxyApplicationBase appBase = new WotlkGameProxyApplicationBase(new NetworkAddressInfo(IPAddress.Parse("127.0.0.1"), 8085),
 				new NetworkAddressInfo(IPAddress.Parse("127.0.0.1"), 5051),
-				new ConsoleLogger(LogLevel.All), gameHandlerModules, 
+				new AggergateCommonLoggingLogger(new ConsoleLogger(LogLevel.All), new FileLogger()), gameHandlerModules, 
 				new GameTestNetworkSerializers());
 
 			if(!appBase.StartServer())
