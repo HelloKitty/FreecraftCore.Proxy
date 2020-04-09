@@ -5,9 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FreecraftCore.Crypto.Packet" Version="1.0.89" />
-    <PackageReference Include="FreecraftCore.Packet.Common" Version="1.0.89" />
-    <PackageReference Include="FreecraftCore.Packet.Game" Version="1.0.89" />
+    <PackageReference Include="FreecraftCore.Crypto.Packet" Version="1.0.90" />
+    <PackageReference Include="FreecraftCore.Packet.Common" Version="1.0.90" />
+    <PackageReference Include="FreecraftCore.Packet.Game" Version="1.0.90" />
   </ItemGroup>
 
   <ItemGroup>

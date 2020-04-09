@@ -9,6 +9,6 @@ namespace FreecraftCore
 	/// </summary>
 	public abstract class AuthenticationClientPayloadHandlerRegisterationModule : PayloadHandlerRegisterationModule<AuthenticationClientPayload, AuthenticationServerPayload, IProxiedMessageContext<AuthenticationServerPayload, AuthenticationClientPayload>>
 	{
-		
+
 	}
 }

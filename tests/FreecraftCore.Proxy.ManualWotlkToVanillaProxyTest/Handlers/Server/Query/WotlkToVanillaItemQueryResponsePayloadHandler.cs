@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace FreecraftCore
 {
-	public sealed class WotlkToVanillaItemQueryResponsePayloadHandler : GameServerPayloadConverterHandler<SMSG_ITEM_QUERY_SINGLE_RESPONSE_Payload_Vanilla, SMSG_ITEM_QUERY_SINGLE_RESPONSE_Payload>
+	/*public sealed class WotlkToVanillaItemQueryResponsePayloadHandler : GameServerPayloadConverterHandler<SMSG_ITEM_QUERY_SINGLE_RESPONSE_Payload_Vanilla, SMSG_ITEM_QUERY_SINGLE_RESPONSE_Payload>
 	{
 		private ITypeConverterProvider<ItemQueryResponseInfo_Vanilla, ItemQueryResponseInfo> ItemQueryResponseConverter { get; }
 
@@ -28,5 +28,5 @@ namespace FreecraftCore
 			//Failed ones don't need conversion.
 			return new SMSG_ITEM_QUERY_SINGLE_RESPONSE_Payload((uint)payload.QueryId);
 		}
-	}
+	}*/
 }

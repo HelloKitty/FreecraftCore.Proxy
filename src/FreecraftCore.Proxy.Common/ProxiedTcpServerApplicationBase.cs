@@ -72,7 +72,9 @@ namespace FreecraftCore
 		{
 			Logger.Info($"Recieved proxy connection from: {details.Address.AddressEndpoint.ToString()}:{details.Address.Port}");
 
-			TcpClient proxyClientTcpClient = new TcpClient(ProxyToEndpointAddress.AddressEndpoint.ToString(), ProxyToEndpointAddress.Port);
+			TcpClient proxyClientTcpClient = new TcpClient();
+
+			proxyClientTcpClient.Connect(ProxyToEndpointAddress.AddressEndpoint.ToString(), ProxyToEndpointAddress.Port);
 
 			//We need to create the proxy client now too
 			var proxyClient = CreateOutgoingSessionPipeline(proxyClientTcpClient);

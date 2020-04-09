@@ -6,8 +6,8 @@ using JetBrains.Annotations;
 
 namespace FreecraftCore
 {
-    public class NetworkSerializerServicePair
-    {
+	public class NetworkSerializerServicePair
+	{
 		/// <summary>
 		/// The serializer used for proxying the client connection.
 		/// </summary>
